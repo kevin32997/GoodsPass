@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="385.0" prefWidth="444.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.ViewCrewDialogController">
+   <children>
+      <Label layoutX="10.0" layoutY="14.0" text="CREW INFORMATION">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="55.0" layoutY="53.0" text="Pass no" />
+      <TextField fx:id="gp_no" editable="false" layoutX="111.0" layoutY="48.0" prefHeight="27.0" prefWidth="308.0" />
+      <Label layoutX="43.0" layoutY="143.0" text="Full name" />
+      <TextField fx:id="full_name" editable="false" layoutX="111.0" layoutY="138.0" prefHeight="27.0" prefWidth="308.0" />
+      <Label layoutX="51.0" layoutY="184.0" text="Address" />
+      <TextField fx:id="address" editable="false" layoutX="111.0" layoutY="179.0" prefHeight="27.0" prefWidth="308.0" />
+      <Label layoutX="30.0" layoutY="225.0" text="Designation" />
+      <TextField fx:id="designation" editable="false" layoutX="111.0" layoutY="220.0" prefHeight="27.0" prefWidth="308.0" />
+      <Label layoutX="27.0" layoutY="266.0" text="Presented ID" />
+      <TextField fx:id="id_presented" editable="false" layoutX="111.0" layoutY="261.0" prefHeight="27.0" prefWidth="308.0" />
+      <Label layoutX="35.0" layoutY="307.0" text="ID Number" />
+      <TextField fx:id="id_number" editable="false" layoutX="111.0" layoutY="302.0" prefHeight="27.0" prefWidth="308.0" />
+      <Button fx:id="btnClose" layoutX="356.0" layoutY="348.0" mnemonicParsing="false" onAction="#onClose" prefHeight="25.0" prefWidth="59.0" text="Close" />
+      <Button fx:id="btnEdit" layoutX="285.0" layoutY="348.0" mnemonicParsing="false" onAction="#onEdit" prefHeight="25.0" prefWidth="59.0" text="Edit" />
+      <Button fx:id="btnRemove" layoutX="33.0" layoutY="348.0" mnemonicParsing="false" onAction="#onDelete" prefHeight="25.0" prefWidth="68.0" text="Remove" />
+      <Label layoutX="17.0" layoutY="92.0" text="Business name" />
+      <TextField fx:id="business_name" editable="false" layoutX="111.0" layoutY="87.0" prefHeight="27.0" prefWidth="308.0" />
+      <Line endX="257.0" layoutX="167.0" layoutY="125.0" startX="-152.0" stroke="#0d0d0d" strokeWidth="0.2" />
+   </children>
+</AnchorPane>

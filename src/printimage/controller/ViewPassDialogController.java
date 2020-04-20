@@ -195,6 +195,7 @@ public class ViewPassDialogController implements Initializable {
         this.dialog_businessName.setText(businessInfo.getBusinessName());
         this.dialog_address.setText(businessInfo.getAddress());
         checkIfPrinted();
+        
     }
 
     public void setCtrl(ViewBusinessInfoController ctrl) {

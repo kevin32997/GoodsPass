@@ -30,22 +30,24 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -55,6 +57,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -339,18 +343,9 @@ public class MainActivityController implements Initializable {
         this.tablecolumn_plateNo.setCellValueFactory(new PropertyValueFactory<Goodspass, String>("vehiclePlateNo"));
         this.tablecolumn_businessName.setCellValueFactory(new PropertyValueFactory<Goodspass, String>("businessName"));
 
-        this.pass_info_mainTable.setRowFactory(tv -> {
-            TableRow<Goodspass> row = new TableRow<>();
-            Goodspass info = row.getItem();
-
-            row.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2 && (!row.isEmpty())) {
-                    openViewPassDialog(row.getItem());
-                }
-            });
-
-            return row;
-        });
+        this.pass_info_mainTable.getSelectionModel().setSelectionMode(
+                SelectionMode.MULTIPLE
+        );
 
         pass_info_mainTable.setRowFactory(row -> new TableRow<Goodspass>() {
             @Override
@@ -374,6 +369,47 @@ public class MainActivityController implements Initializable {
                         openViewPassDialog(getItem());
                     }
                 });
+            }
+        });
+
+        ContextMenu cm = new ContextMenu();
+
+        pass_info_mainTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent t) {
+                if (t.getButton() == MouseButton.SECONDARY) {
+                    cm.getItems().clear();
+
+                    if (pass_info_mainTable.getSelectionModel().getSelectedItems().size() > 1) {
+                        MenuItem printAll = new MenuItem("Print All");
+                        printAll.setOnAction(e -> {
+                            System.out.println("i was clicked");
+                            openMultiplePrint(pass_info_mainTable.getSelectionModel().getSelectedItems());
+                        });
+                        cm.getItems().add(printAll);
+
+                        cm.show(pass_info_mainTable, t.getScreenX(), t.getScreenY());
+                    } else {
+                        MenuItem view = new MenuItem("View");
+                        view.setOnAction(e -> {
+                            openViewPassDialog(pass_info_mainTable.getSelectionModel().getSelectedItem());
+                        });
+                        cm.getItems().add(view);
+                        MenuItem preview = new MenuItem("Print Preview");
+                        preview.setOnAction(e -> {
+
+                        });
+                        cm.getItems().add(preview);
+
+                        cm.show(pass_info_mainTable, t.getScreenX(), t.getScreenY());
+                    }
+                }
+
+                if (t.getButton() == MouseButton.PRIMARY) {
+
+                    cm.hide();
+                }
             }
         });
 
@@ -821,6 +857,12 @@ public class MainActivityController implements Initializable {
             stage.showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void openMultiplePrint(ObservableList<Goodspass> passes) {
+        for (Goodspass pass : passes) {
+            System.out.println("Passes to print: " + pass.getGpNo());
         }
     }
 

@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,12 +34,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import printimage.models.Passes;
 import printimage.PrintImage;
-import printimage.models.Setting;
+import javafx.scene.text.Text;
 
 /**
  * FXML Controller class
@@ -103,6 +106,10 @@ public class PrintLayoutController implements Initializable {
 
     private ViewPassDialogController driverInfoCtrl;
 
+    private double default_fontsize = 15;
+    private Font defaultFont = Font.font("Arial", FontWeight.BOLD, default_fontsize);
+    private double MAX_TEXT_WIDTH = 298;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
@@ -128,17 +135,49 @@ public class PrintLayoutController implements Initializable {
 
         this.pass = pass;
 
+        // Auto resize labels on Pass
+        // Business Name Field
         this.business_name.setText(pass.getBusinessName());
+        autoResizeField(business_name, pxBName);
+
+        ////////////////////////////////////////////////////
+        // Business 
         this.business_address.setText(pass.getAddress());
+        autoResizeField(business_address, this.pxBAddress);
+        ////////////////////////////////////////////////////
         this.vehicle_plate_number.setText(pass.getPlateNo());
+        autoResizeField(vehicle_plate_number, this.pxVehicleNo);
+
         this.vehicle_description.setText(pass.getDescription());
+        autoResizeField(vehicle_description, this.pxDescription);
+
         this.designation_1.setText(pass.getDesignation_1());
+        autoResizeField(designation_1, this.pxDes1);
+
         this.designation_2.setText(pass.getDesignation_2());
+        autoResizeField(designation_2, this.pxDes2);
+        
         this.ctrl_number.setText(pass.getCtrlNo());
         try {
             this.main_image.setImage(createQrCode(pass.getQrCode()));
         } catch (IOException ex) {
             Logger.getLogger(PrintLayoutController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void autoResizeField(Label label, TextField tf) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        Text temptext = new Text(label.getText());
+        temptext.setFont(defaultFont);
+
+        double textWidth = temptext.getLayoutBounds().getWidth();
+        if (textWidth <= this.MAX_TEXT_WIDTH) {
+            label.setFont(defaultFont);
+        } else {
+            double newFontSize = this.default_fontsize * MAX_TEXT_WIDTH / textWidth;
+            label.setFont(Font.font(defaultFont.getFamily(), FontWeight.BOLD, newFontSize));
+            tf.setText(df.format(newFontSize));
         }
 
     }

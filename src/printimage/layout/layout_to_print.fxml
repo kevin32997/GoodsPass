@@ -17,22 +17,22 @@
       </ImageView>
       <Label fx:id="business_name" layoutX="212.0" layoutY="306.0" prefHeight="15.0" prefWidth="298.0" text="EVERGOOD DELIVERY AND FREIGHT SERVICES" AnchorPane.bottomAnchor="391.0">
          <font>
-            <Font name="Arial Bold" size="15.0" />
+            <Font name="Consolas Bold" size="15.0" />
          </font>
       </Label>
       <Label fx:id="business_address" layoutX="212.0" layoutY="330.0" prefHeight="15.0" prefWidth="298.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="367.0">
          <font>
-            <Font name="Arial Bold" size="15.0" />
+            <Font name="Consolas Bold" size="15.0" />
          </font>
       </Label>
       <Label fx:id="vehicle_plate_number" layoutX="212.0" layoutY="354.0" prefHeight="15.0" prefWidth="298.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="343.0">
          <font>
-            <Font name="Arial Bold" size="15.0" />
+            <Font name="Consolas Bold" size="15.0" />
          </font>
       </Label>
       <Label fx:id="vehicle_description" layoutX="212.0" layoutY="380.0" prefHeight="15.0" prefWidth="298.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="317.0">
          <font>
-            <Font name="Arial Bold" size="15.0" />
+            <Font name="Consolas Bold" size="15.0" />
          </font>
       </Label>
       <Label fx:id="designation_1" layoutX="190.0" layoutY="445.0" prefHeight="15.0" prefWidth="317.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="252.0">

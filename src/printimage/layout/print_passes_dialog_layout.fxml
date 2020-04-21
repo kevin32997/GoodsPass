@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="416.0" prefWidth="401.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="printimage.controller.PrintPassesCtrl">
+<AnchorPane id="AnchorPane" prefHeight="416.0" prefWidth="401.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.PrintPassesCtrl">
    <children>
       <ListView fx:id="list_view" layoutX="14.0" layoutY="36.0" prefHeight="329.0" prefWidth="375.0" />
       <Button layoutX="252.0" layoutY="377.0" mnemonicParsing="false" onAction="#onPrintAll" prefHeight="25.0" prefWidth="61.0" text="Print All" />
@@ -17,5 +16,6 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
+      <Label fx:id="passes_size" layoutX="352.0" layoutY="16.0" text="Size: 0" AnchorPane.rightAnchor="15.0" />
    </children>
 </AnchorPane>

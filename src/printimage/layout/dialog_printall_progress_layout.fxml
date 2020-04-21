@@ -5,20 +5,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="150.0" prefWidth="326.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1">
+<AnchorPane id="AnchorPane" prefHeight="121.0" prefWidth="325.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ProgressBar fx:id="progress" layoutX="17.0" layoutY="87.0" prefHeight="18.0" prefWidth="292.0" progress="0.0" />
-      <Label layoutX="17.0" layoutY="12.0" text="Printing">
+      <Label fx:id="progress_label" layoutX="17.0" layoutY="9.0" text="Preparing to print">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="print_count" layoutX="277.0" layoutY="116.0" text="0/10" />
-      <Label layoutX="17.0" layoutY="61.0" text="Please wait . . . .">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
+      <Label layoutX="17.0" layoutY="61.0" text="Please wait . . . ." />
+      <ProgressBar layoutX="17.0" layoutY="87.0" prefHeight="18.0" prefWidth="297.0" />
+      <Label layoutX="17.0" layoutY="42.0" text="Page count 4" />
    </children>
 </AnchorPane>

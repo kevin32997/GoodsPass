@@ -11,10 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -42,6 +39,7 @@ import javax.imageio.ImageIO;
 import printimage.models.Passes;
 import printimage.PrintImage;
 import javafx.scene.text.Text;
+import printimage.helpers.Helper;
 
 /**
  * FXML Controller class
@@ -156,7 +154,7 @@ public class PrintLayoutController implements Initializable {
 
         this.designation_2.setText(pass.getDesignation_2());
         autoResizeField(designation_2, this.pxDes2);
-        
+
         this.ctrl_number.setText(pass.getCtrlNo());
         try {
             this.main_image.setImage(createQrCode(pass.getQrCode()));
@@ -184,9 +182,7 @@ public class PrintLayoutController implements Initializable {
 
     @FXML
     void saveOnclick(ActionEvent event) {
-
         main_pane.getChildren().remove(this.sub_pane);
-
         stage.setMaxWidth(568);
         stage.setMaxWidth(568);
         main_pane.setPrefWidth(568);
@@ -212,7 +208,6 @@ public class PrintLayoutController implements Initializable {
         WritableImage img = pixelScaleAwareCanvasSnapshot(this.main_pane, 3);
         // File fileToSave = chooser.getSelectedFile();//Remove this line.
         BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
-
         try {
             File fileToSave = new File(MainActivityController.settings.getFolderPath(), pass.getCtrlNo() + ".png");
             ImageIO.write(img2, "png", fileToSave);
@@ -223,10 +218,8 @@ public class PrintLayoutController implements Initializable {
             alert.showAndWait();
             driverInfoCtrl.updatePass();
             this.stage.close();
-
         } catch (IOException ex) {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
-
             Alert alert = new Alert(AlertType.WARNING);
             alert.setTitle("Save Error");
             alert.setHeaderText("Image not saved! Please check save file path.");
@@ -293,38 +286,13 @@ public class PrintLayoutController implements Initializable {
     }
 
     public Image createQrCode(String qrcode) throws FileNotFoundException, IOException {
-        QrCode qr0 = QrCode.encodeText("gpzn@" + getMd5(PrintImage.salt + qrcode + PrintImage.pepper), QrCode.Ecc.MEDIUM);
+        QrCode qr0 = QrCode.encodeText("gpzn@" + Helper.getMd5(PrintImage.salt + qrcode + PrintImage.pepper), QrCode.Ecc.MEDIUM);
         BufferedImage img = qr0.toImage(5, 5);
         ImageIO.write(img, "png", new File("qr-code.png"));
         FileInputStream input = new FileInputStream("qr-code.png");
         Image image = new Image(input);
 
         return image;
-    }
-
-    public String getMd5(String input) {
-        try {
-
-            // Static getInstance method is called with hashing MD5 
-            MessageDigest md = MessageDigest.getInstance("MD5");
-
-            // digest() method is called to calculate message digest 
-            //  of an input digest() return array of byte 
-            byte[] messageDigest = md.digest(input.getBytes());
-
-            // Convert byte array into signum representation 
-            BigInteger no = new BigInteger(1, messageDigest);
-
-            // Convert message digest into hex value 
-            String hashtext = no.toString(16);
-            while (hashtext.length() < 32) {
-                hashtext = "0" + hashtext;
-            }
-            return hashtext;
-        } // For specifying wrong message digest algorithms 
-        catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

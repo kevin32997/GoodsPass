@@ -861,8 +861,24 @@ public class MainActivityController implements Initializable {
     }
 
     private void openMultiplePrint(ObservableList<Goodspass> passes) {
-        for (Goodspass pass : passes) {
-            System.out.println("Passes to print: " + pass.getGpNo());
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_passes_dialog_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            PrintPassesCtrl ctrl = (PrintPassesCtrl) fxmlLoader.getController();
+
+            Scene scene = new Scene(parent, 395, 416);
+            Stage stage = new Stage();
+            stage.setTitle("PRINT PASSES");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            ctrl.setStage(stage);
+            ctrl.setData(db, passes);
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

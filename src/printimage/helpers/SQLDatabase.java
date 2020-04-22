@@ -234,6 +234,7 @@ public class SQLDatabase {
                 pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setBusinessName(resultSet.getString("business_name"));
                 pass.setStatus(resultSet.getString("status"));
                 pass.setDate_printed(resultSet.getString("date_printed"));
                 passes.add(pass);

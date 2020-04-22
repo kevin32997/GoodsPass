@@ -28,6 +28,7 @@ import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
 import javafx.print.PrinterJob;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
@@ -64,28 +65,42 @@ public class PrintPassesCtrl implements Initializable {
     @FXML
     private ListView<AnchorPane> list_view;
     private ObservableList<Goodspass> listToPrint;
+    private ObservableList<WritableImage> pass_images;
+    private ObservableList<AnchorPane> paneToPrint;
+
     @FXML
     private Label passes_size;
-    
+
     private Stage stage;
     private SQLDatabase db;
-    
+
+    @FXML
+    private Button btnPrint;
+
+    @FXML
+    private Button btnPreview;
+
+    @FXML
+    private ProgressIndicator progress;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    
+
     public void setData(SQLDatabase db, ObservableList<Goodspass> passes) {
         this.db = db;
         this.listToPrint = passes;
         passes_size.setText("Size: " + this.listToPrint.size());
         setupListData();
+        // Setups Pages to be printed
+        setupPageToPrint();
     }
-    
+
     private void setupListData() {
         for (Goodspass pass : listToPrint) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_view_item_layout.fxml"));
@@ -94,50 +109,47 @@ public class PrintPassesCtrl implements Initializable {
                 Label label = (Label) parent.lookup("#item_label");
                 Button btnPrint = (Button) parent.lookup("#item_print");
                 ProgressIndicator progress = (ProgressIndicator) parent.lookup("#item_progress");
-                
+
                 label.setText(pass.getGpNo() + " - " + pass.getBusinessName());
-                btnPrint.setOnAction(e -> {
-                    btnPrint.setVisible(false);
-                    progress.setVisible(true);
-                    printPass(pass, progress);
-                });
+            
                 list_view.getItems().add(parent);
-                
+
             } catch (IOException ex) {
                 Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
-    
+
+
     private void printPass(Goodspass pass, ProgressIndicator progress) {
         new Thread(() -> {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/layout_to_print_auto.fxml"));
                 AnchorPane toPrint = fxmlLoader.load();
                 Text control_number = (Text) toPrint.lookup("#control_no");
-                
+
                 Text business_name = (Text) toPrint.lookup("#business_name");
                 Text business_address = (Text) toPrint.lookup("#business_address");
                 Text plate_no = (Text) toPrint.lookup("#plate_no");
                 Text description = (Text) toPrint.lookup("#description");
-                
+
                 Text designation1 = (Text) toPrint.lookup("#designation1");
                 Text designation2 = (Text) toPrint.lookup("#designation2");
-                
+
                 control_number.setText(pass.getGpNo());
-                
+
                 business_name.setText(pass.getBusinessName());
                 autoResizeField(business_name);
-                
+
                 business_address.setText(pass.getBusinessAddress());
                 autoResizeField(business_address);
-                
+
                 plate_no.setText(pass.getVehiclePlateNo());
                 autoResizeField(plate_no);
-                
+
                 description.setText(pass.getVehicleDesc());
                 autoResizeField(description);
-                
+
                 Platform.runLater(() -> {
                     save(toPrint, pass.getGpNo(), progress);
                 });
@@ -145,11 +157,10 @@ public class PrintPassesCtrl implements Initializable {
                 Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
-        
+
     }
-    
+
     private void save(AnchorPane pane, String title, ProgressIndicator progress) {
-        
         WritableImage img = pixelScaleAwareCanvasSnapshot(pane, 3);
         // File fileToSave = chooser.getSelectedFile();//Remove this line.
 
@@ -161,19 +172,19 @@ public class PrintPassesCtrl implements Initializable {
             // this.stage.close();
         } catch (IOException ex) {
             Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-            
+
         } catch (NullPointerException ex) {
             Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private double default_fontsize = 15;
     private Font defaultFont = Font.font("Consolas", FontWeight.BOLD, default_fontsize);
     private double MAX_TEXT_WIDTH = 298;
-    
+
     private void autoResizeField(Text text) {
         text.setFont(defaultFont);
-        
+
         double textWidth = text.getLayoutBounds().getWidth();
         if (textWidth <= this.MAX_TEXT_WIDTH) {
             text.setFont(defaultFont);
@@ -181,16 +192,16 @@ public class PrintPassesCtrl implements Initializable {
             double newFontSize = this.default_fontsize * MAX_TEXT_WIDTH / textWidth;
             text.setFont(Font.font(defaultFont.getFamily(), FontWeight.BOLD, newFontSize));
         }
-        
+
     }
-    
+
     private WritableImage pixelScaleAwareCanvasSnapshot(AnchorPane pane, double pixelScale) {
         WritableImage writableImage = new WritableImage((int) Math.rint(pixelScale * 551), (int) Math.rint(pixelScale * 714));
         SnapshotParameters spa = new SnapshotParameters();
         spa.setTransform(Transform.scale(pixelScale, pixelScale));
         return pane.snapshot(spa, writableImage);
     }
-    
+
     private Image createQrCode(String qrcode) throws FileNotFoundException, IOException {
         QrCode qr0 = QrCode.encodeText("gpzn@" + Helper.getMd5(PrintImage.salt + qrcode + PrintImage.pepper), QrCode.Ecc.MEDIUM);
         BufferedImage img = qr0.toImage(5, 5);
@@ -199,39 +210,79 @@ public class PrintPassesCtrl implements Initializable {
         Image image = new Image(input);
         return image;
     }
-    
+
     @FXML
     void onCancel(ActionEvent event) {
-        
+        this.stage.close();
     }
-    
+
+    @FXML
+    void onPreview(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_preview_dialog_layout.fxml"));
+            Parent parent;
+            parent = fxmlLoader.load();
+            PrintPreviewCtrl ctrl = fxmlLoader.getController();
+
+            Stage stage = new Stage();
+            stage.setTitle("PREVIEW - PAGE COUNT: " + paneToPrint.size());
+            Scene scene = new Scene(parent, 770, 720);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            ctrl.setCtrl(this);
+
+            ctrl.setPages(paneToPrint);
+
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     @FXML
     void onPrintAll(ActionEvent event) {
-        
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_printall_progress_layout.fxml"));
             AnchorPane progressDialog = fxmlLoader.load();
-            
+
             Stage stage = new Stage();
             stage.setTitle("PRINTING");
             stage.setResizable(false);
-            Scene scene = new Scene(progressDialog, 325, 120);
+            Scene scene = new Scene(progressDialog, 325, 146);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
-            
+
+            Label pageCount = (Label) progressDialog.lookup("#page_count");
+
+            pageCount.setText("Page count " + paneToPrint.size());
+
             stage.show();
-            setupPageToPrint(stage, (Label) progressDialog.lookup("#progress_label"));
+
+            PrinterJob printJob = this.print(paneToPrint, stage);
+
+            Button btnCancel = (Button) progressDialog.lookup("#btnCancel");
+
+            btnCancel.setOnAction(e -> {
+                if (printJob != null) {
+                    printJob.cancelJob();
+                    printJob.endJob();
+                    stage.close();
+                }
+            });
 
             // Fetch progress layout
         } catch (IOException ex) {
             Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private void setupPageToPrint(Stage dialogStage, Label dialogLabel) {
+
+    // Builds Passes Images to be printed
+    private void setupPageToPrint() {
         // Check pages count first
-        ObservableList<WritableImage> img_passes = FXCollections.observableArrayList();
-        
+        pass_images = FXCollections.observableArrayList();
+
         new Thread(() -> {
             for (Goodspass pass : listToPrint) {
                 ObservableList<Crew> crews = db.getAllCrewByGPNo(pass.getGpNo());
@@ -239,31 +290,31 @@ public class PrintPassesCtrl implements Initializable {
                     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/layout_to_print_auto.fxml"));
                     AnchorPane toPrint = fxmlLoader.load();
                     Text control_number = (Text) toPrint.lookup("#control_no");
-                    
+
                     Text business_name = (Text) toPrint.lookup("#business_name");
                     Text business_address = (Text) toPrint.lookup("#business_address");
                     Text plate_no = (Text) toPrint.lookup("#plate_no");
                     Text description = (Text) toPrint.lookup("#description");
-                    
+
                     ImageView image = (ImageView) toPrint.lookup("#main_image");
-                    
+
                     control_number.setText(pass.getGpNo());
-                    
+
                     business_name.setText(pass.getBusinessName());
                     autoResizeField(business_name);
-                    
+
                     business_address.setText(pass.getBusinessAddress());
                     autoResizeField(business_address);
-                    
+
                     plate_no.setText(pass.getVehiclePlateNo());
                     autoResizeField(plate_no);
-                    
+
                     description.setText(pass.getVehicleDesc());
                     autoResizeField(description);
-                    
+
                     Text designation1 = (Text) toPrint.lookup("#designation1");
                     Text designation2 = (Text) toPrint.lookup("#designation2");
-                    
+
                     if (crews.size() > 0) {
                         designation1.setText(crews.get(0).getFullname() + " - " + crews.get(0).getDesignation());
                         if (crews.size() > 1) {
@@ -272,15 +323,15 @@ public class PrintPassesCtrl implements Initializable {
                             designation2.setText("NONE");
                         }
                     }
-                    
+
                     autoResizeField(designation1);
                     autoResizeField(designation2);
-                    
+
                     Platform.runLater(() -> {
                         try {
                             image.setImage(createQrCode(pass.getGpNo()));
                             WritableImage img = pixelScaleAwareCanvasSnapshot(toPrint, 3);
-                            img_passes.add(img);
+                            pass_images.add(img);
                             // File fileToSave = chooser.getSelectedFile();//Remove this line.
                             // BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
                             // this.stage.close();
@@ -299,14 +350,14 @@ public class PrintPassesCtrl implements Initializable {
             }
 
             // End
-            setupPages(img_passes, dialogStage, dialogLabel);
-            
+            setupPages();
+
         }).start();
     }
-    
-    private void setupPages(ObservableList<WritableImage> pass_images, Stage stage, Label label) {
-        ObservableList<AnchorPane> paneToPrint = FXCollections.observableArrayList();
-        
+
+    // Builds Pages of Passes to be printed
+    private void setupPages() {
+        paneToPrint = FXCollections.observableArrayList();
         int pageCount = this.listToPrint.size() / 4;
         if (listToPrint.size() % 4 > 0) {
             pageCount++;
@@ -317,28 +368,32 @@ public class PrintPassesCtrl implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/pass_print_page_layout.fxml"));
             try {
                 AnchorPane page = fxmlLoader.load();
-                
+
                 for (int ii = 0; ii < 4; ii++) {
-                    
+
                     if (settledPasses < passesSize) {
                         ImageView img = (ImageView) page.lookup("#pass" + (ii + 1));
                         img.setImage(pass_images.get(settledPasses));
                         img.setVisible(true);
                         settledPasses++;
                     } else {
-                        
+
                     }
                 }
-                
+
                 paneToPrint.add(page);
             } catch (IOException ex) {
                 Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        // print(paneToPrint, stage);
+
         Platform.runLater(() -> {
-            label.setText("Printing Passes");
+            btnPrint.setDisable(false);
+            btnPreview.setDisable(false);
+            progress.setVisible(false);
+
         });
-        print(paneToPrint, stage);
     }
 
     /*
@@ -451,28 +506,32 @@ public class PrintPassesCtrl implements Initializable {
                 pass.setDate_sql(new Date(dateToday.getTime()));
                 db.updatePassInfo(pass);
             }
+
         }).start();
     }
-    
-    private void print(ObservableList<AnchorPane> pagesToPrint, Stage progressStage) {
+
+    private PrinterJob print(ObservableList<AnchorPane> pagesToPrint, Stage progressStage) {
         PrinterJob printerJob = PrinterJob.createPrinterJob();
         if (printerJob != null) {
-            
+
             PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, 0, 0, 0, 0);
-            
+
             for (AnchorPane pane : pagesToPrint) {
                 printerJob.printPage(pageLayout, pane);
             }
             printerJob.endJob();
             progressStage.close();
             updatePasses();
+
         }
+        return printerJob;
     }
-    
+
     private void updatePasses() {
         for (Goodspass pass : this.listToPrint) {
             updatePassInfo(pass);
         }
+        db.updateDB();
     }
-    
+
 }

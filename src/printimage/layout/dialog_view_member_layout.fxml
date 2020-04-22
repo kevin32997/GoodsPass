@@ -21,7 +21,7 @@
       <TextField fx:id="dialog_plateNo" editable="false" layoutX="110.0" layoutY="223.0" prefHeight="27.0" prefWidth="308.0" />
       <Label layoutX="17.0" layoutY="91.0" text="Business name" />
       <TextField fx:id="dialog_businessName" editable="false" layoutX="111.0" layoutY="86.0" prefHeight="27.0" prefWidth="308.0" />
-      <Button fx:id="btnPreview" layoutX="28.0" layoutY="358.0" mnemonicParsing="false" onAction="#onPreview" prefHeight="25.0" prefWidth="389.0" text="Preview ID Layout" />
+      <Button fx:id="btnPreview" layoutX="31.0" layoutY="358.0" mnemonicParsing="false" onAction="#onPreview" prefHeight="25.0" prefWidth="186.0" text="Preview Pass Layout" />
       <Button fx:id="btnClose" layoutX="752.0" layoutY="358.0" mnemonicParsing="false" onAction="#onClose" prefHeight="25.0" prefWidth="93.0" text="Close" />
       <Button fx:id="btnEdit" layoutX="355.0" layoutY="312.0" mnemonicParsing="false" onAction="#onEdit" prefHeight="17.0" prefWidth="64.0" text="Edit" />
       <Button fx:id="btnDelete" layoutX="252.0" layoutY="312.0" mnemonicParsing="false" onAction="#onDelete" prefHeight="25.0" prefWidth="78.0" text="Delete" />
@@ -49,5 +49,6 @@
          </font>
       </Label>
       <Button fx:id="btnAdd" layoutX="439.0" layoutY="358.0" mnemonicParsing="false" onAction="#onAddCrew" prefHeight="25.0" prefWidth="93.0" text="Add Crew" />
+      <Button fx:id="btnPreview1" layoutX="232.0" layoutY="358.0" mnemonicParsing="false" onAction="#onPrint" prefHeight="25.0" prefWidth="186.0" text="Print" />
    </children>
 </AnchorPane>

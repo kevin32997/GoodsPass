@@ -8,6 +8,9 @@ package printimage.controller;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -181,6 +184,7 @@ public class ViewPassDialogController implements Initializable {
         if (businessInfo == null) {
             businessInfo = new BusinessInfo();
         }
+       
 
         crews = db.getAllCrewByGPNo(info.getGpNo());
 
@@ -195,7 +199,7 @@ public class ViewPassDialogController implements Initializable {
         this.dialog_businessName.setText(businessInfo.getBusinessName());
         this.dialog_address.setText(businessInfo.getAddress());
         checkIfPrinted();
-        
+
     }
 
     public void setCtrl(ViewBusinessInfoController ctrl) {
@@ -205,21 +209,51 @@ public class ViewPassDialogController implements Initializable {
     private int viewtype = 0;
 
     private void checkIfPrinted() {
+
         if (info.getDate_printed() != null) {
-            btnEdit.setVisible(false);
-            btnEdit.setDisable(true);
+            try {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                java.util.Date dateToday = new java.util.Date();
+                java.util.Date datePrinted = df.parse(info.getDate_printed());
 
-            btnDelete.setVisible(false);
-            btnDelete.setDisable(true);
+                Calendar calPrinted = Calendar.getInstance();
+                Calendar calToday = Calendar.getInstance();
 
-            btnHold.setVisible(false);
-            btnHold.setDisable(true);
+                calPrinted.setTime(datePrinted);
+                calToday.setTime(dateToday);
 
-            btnAdd.setVisible(false);
-            btnAdd.setDisable(true);
-            viewtype = ViewCrewDialogController.FORM_VIEW;
-            dialog_date_printed.setText(info.getDate_printed());
+                System.out.println("Date printed day of year " + calPrinted.get(Calendar.DAY_OF_YEAR));
+
+                System.out.println("Date today day of year " + calToday.get(Calendar.DAY_OF_YEAR));
+
+                boolean samedate = calPrinted.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
+                        && calPrinted.get(Calendar.YEAR) == calToday.get(Calendar.YEAR);
+
+                if (samedate) {
+                    System.out.println("This is true");
+                    viewtype = ViewCrewDialogController.FORM_EDIT;
+                } else {
+
+                    btnEdit.setVisible(false);
+                    btnEdit.setDisable(true);
+
+                    btnDelete.setVisible(false);
+                    btnDelete.setDisable(true);
+
+                    btnHold.setVisible(false);
+                    btnHold.setDisable(true);
+
+                    btnAdd.setVisible(false);
+                    btnAdd.setDisable(true);
+                    viewtype = ViewCrewDialogController.FORM_VIEW;
+                }
+
+                dialog_date_printed.setText(info.getDate_printed());
+            } catch (ParseException ex) {
+                Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
+
             viewtype = ViewCrewDialogController.FORM_EDIT;
             dialog_date_printed.setText("NOT PRINTED.");
         }
@@ -260,14 +294,16 @@ public class ViewPassDialogController implements Initializable {
     }
 
     public void updatePass() {
-        info.setStatus("" + MainActivityController.STATUS_PRINTED);
-        java.util.Date date_today = new java.util.Date();
-        Date sqlDate = new Date(date_today.getTime());
-        info.setDate_sql(sqlDate);
-        info.setDate_printed(sqlDate.toString());
-        db.updatePassInfo(info);
-        db.updateDB();
 
+        if (!info.getStatus().equals("1")) {
+            info.setStatus("" + MainActivityController.STATUS_PRINTED);
+            java.util.Date date_today = new java.util.Date();
+            Date sqlDate = new Date(date_today.getTime());
+            info.setDate_sql(sqlDate);
+            info.setDate_printed(sqlDate.toString());
+            db.updatePassInfo(info);
+            db.updateDB();
+        }
         this.checkIfPrinted();
         if (ctrl != null) {
             ctrl.loadData();
@@ -397,6 +433,33 @@ public class ViewPassDialogController implements Initializable {
 
     @FXML
     void onHold(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onPrint(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_passes_dialog_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            PrintPassesCtrl ctrl = (PrintPassesCtrl) fxmlLoader.getController();
+
+            Scene scene = new Scene(parent, 395, 416);
+            Stage stage = new Stage();
+            stage.setTitle("PRINT PASSES");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            ctrl.setStage(stage);
+
+            ObservableList<Goodspass> passes = FXCollections.observableArrayList();
+            passes.add(info);
+            ctrl.setData(db, passes);
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 

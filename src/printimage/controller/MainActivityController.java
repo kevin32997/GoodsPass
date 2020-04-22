@@ -384,7 +384,6 @@ public class MainActivityController implements Initializable {
                     if (pass_info_mainTable.getSelectionModel().getSelectedItems().size() > 1) {
                         MenuItem printAll = new MenuItem("Print All");
                         printAll.setOnAction(e -> {
-                            System.out.println("i was clicked");
                             openMultiplePrint(pass_info_mainTable.getSelectionModel().getSelectedItems());
                         });
                         cm.getItems().add(printAll);
@@ -396,9 +395,9 @@ public class MainActivityController implements Initializable {
                             openViewPassDialog(pass_info_mainTable.getSelectionModel().getSelectedItem());
                         });
                         cm.getItems().add(view);
-                        MenuItem preview = new MenuItem("Print Preview");
+                        MenuItem preview = new MenuItem("Print");
                         preview.setOnAction(e -> {
-
+                            openMultiplePrint(pass_info_mainTable.getSelectionModel().getSelectedItems());
                         });
                         cm.getItems().add(preview);
 

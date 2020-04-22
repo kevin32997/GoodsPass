@@ -60,22 +60,22 @@ public class PrintLayoutController implements Initializable {
     @FXML
     private Label ctrl_number;
     @FXML
-    private Label business_name;
+    private Text business_name;
 
     @FXML
-    private Label business_address;
+    private Text business_address;
 
     @FXML
-    private Label vehicle_plate_number;
+    private Text vehicle_plate_number;
 
     @FXML
-    private Label vehicle_description;
+    private Text vehicle_description;
 
     @FXML
-    private Label designation_1;
+    private Text designation_1;
 
     @FXML
-    private Label designation_2;
+    private Text designation_2;
 
     @FXML
     private ImageView main_image;
@@ -105,7 +105,7 @@ public class PrintLayoutController implements Initializable {
     private ViewPassDialogController driverInfoCtrl;
 
     private double default_fontsize = 15;
-    private Font defaultFont = Font.font("Arial", FontWeight.BOLD, default_fontsize);
+    private Font defaultFont = Font.font("Consolas", FontWeight.BOLD, default_fontsize);
     private double MAX_TEXT_WIDTH = 298;
 
     @Override
@@ -164,19 +164,23 @@ public class PrintLayoutController implements Initializable {
 
     }
 
-    private void autoResizeField(Label label, TextField tf) {
+    private void autoResizeField(Text text, TextField tf) {
         DecimalFormat df = new DecimalFormat("#.00");
-        Text temptext = new Text(label.getText());
-        temptext.setFont(defaultFont);
 
-        double textWidth = temptext.getLayoutBounds().getWidth();
+        text.setFont(defaultFont);
+
+        double textWidth = text.getLayoutBounds().getWidth();
         if (textWidth <= this.MAX_TEXT_WIDTH) {
-            label.setFont(defaultFont);
+            text.setFont(defaultFont);
         } else {
             double newFontSize = this.default_fontsize * MAX_TEXT_WIDTH / textWidth;
-            label.setFont(Font.font(defaultFont.getFamily(), FontWeight.BOLD, newFontSize));
+            text.setFont(Font.font(defaultFont.getFamily(), FontWeight.BOLD, newFontSize));
             tf.setText(df.format(newFontSize));
         }
+    }
+    
+    @FXML
+    void onPrint(ActionEvent event){
 
     }
 

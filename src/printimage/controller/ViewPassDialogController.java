@@ -184,7 +184,6 @@ public class ViewPassDialogController implements Initializable {
         if (businessInfo == null) {
             businessInfo = new BusinessInfo();
         }
-       
 
         crews = db.getAllCrewByGPNo(info.getGpNo());
 
@@ -210,8 +209,9 @@ public class ViewPassDialogController implements Initializable {
 
     private void checkIfPrinted() {
 
-        if (info.getDate_printed() != null) {
+        if (info.getStatus().equals("" + MainActivityController.STATUS_PRINTED) || info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
             try {
+
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 java.util.Date dateToday = new java.util.Date();
                 java.util.Date datePrinted = df.parse(info.getDate_printed());
@@ -222,18 +222,12 @@ public class ViewPassDialogController implements Initializable {
                 calPrinted.setTime(datePrinted);
                 calToday.setTime(dateToday);
 
-                System.out.println("Date printed day of year " + calPrinted.get(Calendar.DAY_OF_YEAR));
-
-                System.out.println("Date today day of year " + calToday.get(Calendar.DAY_OF_YEAR));
-
                 boolean samedate = calPrinted.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
                         && calPrinted.get(Calendar.YEAR) == calToday.get(Calendar.YEAR);
 
                 if (samedate) {
-                    System.out.println("This is true");
                     viewtype = ViewCrewDialogController.FORM_EDIT;
                 } else {
-
                     btnEdit.setVisible(false);
                     btnEdit.setDisable(true);
 
@@ -248,7 +242,13 @@ public class ViewPassDialogController implements Initializable {
                     viewtype = ViewCrewDialogController.FORM_VIEW;
                 }
 
-                dialog_date_printed.setText(info.getDate_printed());
+                if (info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
+                    btnHold.setText("Approve");
+                    dialog_date_printed.setText(info.getDate_printed() + " - CANCELLED");
+                } else {
+                    btnHold.setText("Cancel");
+                    dialog_date_printed.setText(info.getDate_printed());
+                }
             } catch (ParseException ex) {
                 Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -305,10 +305,59 @@ public class ViewPassDialogController implements Initializable {
             db.updateDB();
         }
         this.checkIfPrinted();
+
+        // if this dialog came from business dialog
         if (ctrl != null) {
             ctrl.loadData();
         }
+    }
 
+    public void cancelPass() {
+
+        info.setStatus("" + MainActivityController.STATUS_HOLD);
+        if (db.updatePassInfo(info)) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Update Success");
+            alert.setHeaderText("Goodspass has been canceled.");
+            alert.showAndWait();
+            db.updateDB();
+        }
+        this.checkIfPrinted();
+
+        // if this dialog came from business dialog
+        if (ctrl != null) {
+            ctrl.loadData();
+        }
+    }
+
+    public void approvePass() {
+
+        if (info.getDate_printed() != null) {
+            info.setStatus("" + MainActivityController.STATUS_PRINTED);
+            if (db.updatePassInfo(info)) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Update Success");
+                alert.setHeaderText("Goodspass has been approved.");
+                alert.showAndWait();
+                db.updateDB();
+            }
+        } else {
+            info.setStatus("" + MainActivityController.STATUS_PENDING);
+            if (db.updatePassInfo(info)) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Update Success");
+                alert.setHeaderText("Goodspass has been approved.");
+                alert.showAndWait();
+                db.updateDB();
+            }
+        }
+
+        this.checkIfPrinted();
+
+        // if this dialog came from business dialog
+        if (ctrl != null) {
+            ctrl.loadData();
+        }
     }
 
     @FXML
@@ -426,14 +475,42 @@ public class ViewPassDialogController implements Initializable {
             this.btnEdit.setText("Edit");
             this.setFields();
             this.fieldsEnable(false);
-
         }
 
     }
 
     @FXML
     void onHold(ActionEvent event) {
+        if (btnHold.getText().equals("Cancel")) {
+            // Cancel
 
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Cancel Pass");
+            alert.setHeaderText("Cancel this Goodspass?");
+            alert.setContentText("Are you sure with this?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                cancelPass();
+            } else {
+                // ... user chose CANCEL or closed the dialog
+            }
+        } else {
+            // Approve
+
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Approve Pass");
+            alert.setHeaderText("Approve this Goodspass?");
+            alert.setContentText("Are you sure with this?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                approvePass();
+
+            } else {
+                // ... user chose CANCEL or closed the dialog
+            }
+        }
     }
 
     @FXML
@@ -453,6 +530,7 @@ public class ViewPassDialogController implements Initializable {
             ctrl.setStage(stage);
 
             ObservableList<Goodspass> passes = FXCollections.observableArrayList();
+            info.setBusinessAddress(businessInfo.getAddress());
             passes.add(info);
             ctrl.setData(db, passes);
 

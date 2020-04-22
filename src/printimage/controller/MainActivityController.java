@@ -355,12 +355,22 @@ public class MainActivityController implements Initializable {
                 if (item == null || empty) {
                     setStyle("");
                 } else {
-                    if (item.getStatus().equals("0")) {
-                        this.getStyleClass().add("statusPending");
-                    } else if (item.getStatus().equals("2")) {
-                        this.getStyleClass().add("statusHold");
-                    } else {
-                        this.getStyleClass().add("statusPrinted");
+
+                    switch (item.getStatus()) {
+                        case "0":
+                            // Pending
+                            this.getStyleClass().add("statusPending");
+                            break;
+                        case "1":
+                            // Printed
+                            this.getStyleClass().add("statusPrinted");
+                            break;
+                        case "2":
+                            // Hold/Canceled
+                            this.getStyleClass().add("statusHold");
+                            break;
+                        default:
+                            break;
                     }
                 }
 

@@ -113,14 +113,25 @@ public class SQLDatabase {
     public boolean updatePassInfo(Goodspass info) {
 
         try {
-            String query = "UPDATE passes SET "
-                    + "gp_no = ?, "
-                    + "vehicle_desc = ?, "
-                    + "vehicle_plate_no = ?, "
-                    + "business_id = ?, "
-                    + "status = ?, "
-                    + "date_printed = ? "
-                    + "WHERE id = ?";
+            String query = "";
+            if (info.getDate_sql() != null) {
+                query = "UPDATE passes SET "
+                        + "gp_no = ?, "
+                        + "vehicle_desc = ?, "
+                        + "vehicle_plate_no = ?, "
+                        + "business_id = ?, "
+                        + "status = ?, "
+                        + "date_printed = ? "
+                        + "WHERE id = ?";
+            } else {
+                query = "UPDATE passes SET "
+                        + "gp_no = ?, "
+                        + "vehicle_desc = ?, "
+                        + "vehicle_plate_no = ?, "
+                        + "business_id = ?, "
+                        + "status = ? "
+                        + "WHERE id = ?";
+            }
 
             PreparedStatement ps = con.prepareStatement(query);
 
@@ -133,12 +144,10 @@ public class SQLDatabase {
 
             if (info.getDate_sql() != null) {
                 ps.setDate(6, info.getDate_sql());
+                ps.setInt(7, info.getId());
             } else {
-                ps.setDate(6, null);
+                ps.setInt(6, info.getId());
             }
-
-            ps.setInt(7, info.getId());
-
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -971,6 +980,9 @@ public class SQLDatabase {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                  REMARKS INFO CRUD 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // DB Update
     private void createUpdateTimeStamp() {

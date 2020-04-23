@@ -10,14 +10,20 @@ package printimage.models;
  * @author Admin
  */
 public class Remark {
-    
+
+    // Static fields
+    public static final int REMARK_PASS = 0;
+    public static final int REMARK_BUSINESS = 1;
+    public static final int REMARK_CREW = 2;
+
     private int id;
     private int type;
     private int remarkId;
     private String description;
-    
-    public Remark(){
-    
+    private String dateCreated;
+
+    public Remark() {
+
     }
 
     public int getId() {
@@ -51,8 +57,12 @@ public class Remark {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    
-            
-    
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 }

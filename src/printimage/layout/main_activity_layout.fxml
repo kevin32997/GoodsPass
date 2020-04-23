@@ -50,7 +50,7 @@
                         <TextField fx:id="create_issued_id2" layoutX="116.0" layoutY="608.0" prefHeight="22.0" prefWidth="311.0" />
                         <TextField fx:id="create_idNumber2" layoutX="116.0" layoutY="647.0" prefHeight="22.0" prefWidth="311.0" />
                         <TextField fx:id="create_designation2" layoutX="116.0" layoutY="688.0" prefHeight="22.0" prefWidth="311.0" />
-                        <Button layoutX="166.0" layoutY="754.0" mnemonicParsing="false" onAction="#saveDriverInfo" prefHeight="32.0" prefWidth="115.0" text="SAVE" />
+                        <Button layoutX="166.0" layoutY="754.0" mnemonicParsing="false" onAction="#saveDriverInfo" prefHeight="22.0" prefWidth="111.0" text="SAVE" />
                         <TextField fx:id="driverInfo_search" layoutX="446.0" layoutY="64.0" prefHeight="25.0" prefWidth="300.0" promptText="Search . . ." AnchorPane.leftAnchor="446.0" AnchorPane.topAnchor="64.0" />
                         <TextField fx:id="driverInfo_pageLimit" layoutX="1137.0" layoutY="64.0" prefHeight="19.0" prefWidth="63.0" text="30" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="64.0" />
                         <Label layoutX="57.0" layoutY="102.0" prefHeight="17.0" prefWidth="52.0" text="Pass No." AnchorPane.topAnchor="102.0" />
@@ -64,7 +64,7 @@
                         <Label layoutX="769.0" layoutY="68.0" text="Search by" AnchorPane.leftAnchor="769.0" AnchorPane.topAnchor="68.0" />
                         <ListView fx:id="search_businessName_listview" layoutX="116.0" layoutY="164.0" prefHeight="112.0" prefWidth="314.0" visible="false" AnchorPane.topAnchor="164.0" />
                         <Label layoutX="1078.0" layoutY="68.0" text="List Limit" AnchorPane.rightAnchor="89.0" AnchorPane.topAnchor="68.0" />
-                        <Pagination fx:id="driverInfo_pagination" layoutX="443.0" layoutY="742.0" prefHeight="45.0" prefWidth="730.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="443.0" AnchorPane.rightAnchor="13.0" />
+                        <Pagination fx:id="driverInfo_pagination" layoutX="560.0" layoutY="756.0" prefHeight="45.0" prefWidth="683.0" AnchorPane.bottomAnchor="19.0" AnchorPane.leftAnchor="560.0" AnchorPane.rightAnchor="109.0" />
                         <Label layoutX="27.0" layoutY="66.0" text="Pass Information">
                            <font>
                               <Font name="System Bold" size="15.0" />
@@ -85,6 +85,7 @@
                         <ChoiceBox fx:id="driverInfo_seachby" layoutX="824.0" layoutY="64.0" prefWidth="150.0" AnchorPane.leftAnchor="824.0" AnchorPane.topAnchor="64.0" />
                         <Label layoutX="39.0" layoutY="433.0" text="ID Number" />
                         <Label layoutX="38.0" layoutY="651.0" text="ID Number" />
+                        <Button layoutX="445.0" layoutY="762.0" mnemonicParsing="false" onAction="#onGenerateReport" prefHeight="25.0" prefWidth="105.0" text="Generate Report" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="445.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -220,7 +221,7 @@
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
-                        <Label layoutX="583.0" layoutY="98.0" text="EXPORT DATA">
+                        <Label layoutX="583.0" layoutY="98.0" text="IMPORT DATA">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>

@@ -31,6 +31,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
@@ -42,6 +43,7 @@ import printimage.models.BusinessInfo;
 import printimage.models.Crew;
 import printimage.models.Goodspass;
 import printimage.models.Passes;
+import printimage.models.Remark;
 
 /**
  * FXML Controller class
@@ -389,25 +391,61 @@ public class ViewPassDialogController implements Initializable {
             dialog_passNo.requestFocus();
         } // Save
         else {
+            try {
+                Stage stage = new Stage();
 
-            info.setVehicleDesc(dialog_vehicleDesc.getText());
-            info.setVehiclePlateNo(dialog_plateNo.getText());
-            info.setBusinessId("" + businessInfo.getId());
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+                Parent parent = fxmlLoader.load();
 
-            // Save to db
-            if (db.updatePassInfo(info)) {
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Update Success");
-                alert.setHeaderText("Information Updated!");
-                alert.showAndWait();
-                db.updateDB();
+                Scene scene = new Scene(parent, 477, 370);
+                stage.setTitle("Update Goodspass");
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
 
-            }
-            btnEdit.setText("Edit");
-            btnDelete.setText("Delete");
-            fieldsEnable(false);
-            if (ctrl != null) {
-                ctrl.loadData();
+                TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+                Button btnSave = (Button) parent.lookup("#btnSave");
+                Button btnCancel = (Button) parent.lookup("#btnCancel");
+
+                btnSave.setOnAction(e -> {
+
+                    // Update pass
+                    info.setVehicleDesc(dialog_vehicleDesc.getText());
+                    info.setVehiclePlateNo(dialog_plateNo.getText());
+                    info.setBusinessId("" + businessInfo.getId());
+
+                    // Save to db
+                    if (db.updatePassInfo(info)) {
+
+                        if (descriptionText.getText().equals("")) {
+                            db.createRemarks(Remark.REMARK_PASS, this.info.getId(), "PASS INFORMATION UPDATED");
+                        } else {
+                            db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText());
+                        }
+                        db.updateDB();
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Update Success");
+                        alert.setHeaderText("Information Updated!");
+                        alert.showAndWait();
+                        stage.close();
+                    }
+
+                    btnEdit.setText("Edit");
+                    btnDelete.setText("Delete");
+                    fieldsEnable(false);
+                    if (ctrl != null) {
+                        ctrl.loadData();
+                    }
+                });
+
+                btnCancel.setOnAction(e -> {
+                    stage.close();
+                });
+
+                stage.show();
+
+            } catch (IOException ex) {
+                Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

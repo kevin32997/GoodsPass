@@ -24,6 +24,7 @@ import javafx.scene.control.Alert.AlertType;
 import printimage.models.BusinessInfo;
 import printimage.models.Crew;
 import printimage.models.Goodspass;
+import printimage.models.Remark;
 
 public class SQLDatabase {
 
@@ -420,6 +421,53 @@ public class SQLDatabase {
         return drivers;
     }
 
+    // View by date
+    public ObservableList<Goodspass> getPassByDate(String date_from, String date_until, String sort_type) {
+        ObservableList<Goodspass> passes = FXCollections.observableArrayList();
+        try {
+
+            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes WHERE created_at BETWEEN '" + date_from + "' AND '" + date_until + "' ORDER BY gp_no " + sort_type + "");
+            while (resultSet.next()) {
+                Goodspass pass = new Goodspass();
+                pass.setId(resultSet.getInt("id"));
+                pass.setGpNo(resultSet.getString("gp_no"));
+                pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
+                pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
+                pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setStatus(resultSet.getString("status"));
+                pass.setDate_printed(resultSet.getString("date_printed"));
+                passes.add(pass);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return passes;
+    }
+
+    public ObservableList<Goodspass> getPassByDateOperation(String date, String operation, String sort_type) {
+        ObservableList<Goodspass> passes = FXCollections.observableArrayList();
+        try {
+ 
+            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes WHERE date(created_at) " + operation + " '" + date + "' ORDER BY gp_no " + sort_type + "");
+
+            while (resultSet.next()) {
+                Goodspass pass = new Goodspass();
+                pass.setId(resultSet.getInt("id"));
+                pass.setGpNo(resultSet.getString("gp_no"));
+                pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
+                pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
+                pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setStatus(resultSet.getString("status"));
+                pass.setDate_printed(resultSet.getString("date_printed"));
+                passes.add(pass);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return passes;
+
+    }
+
     // View All
     public String getLatestGPNo() {
         ObservableList<Goodspass> passes = FXCollections.observableArrayList();
@@ -789,7 +837,6 @@ public class SQLDatabase {
                     + "?, "
                     + "?, "
                     + "?)";
-
             // create the mysql insert preparedstatement
             PreparedStatement preparedStmt = con.prepareStatement(query, new String[]{"id"});
             preparedStmt.setString(1, info.getGpNo());
@@ -983,6 +1030,86 @@ public class SQLDatabase {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                  REMARKS INFO CRUD 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CREATE
+    public boolean createRemarks(Remark remark) {
+        int return_value = 0;
+        try {
+            String query = "INSERT into remarks ("
+                    + "type, "
+                    + "remarks_id, "
+                    + "description "
+                    + ") values ("
+                    + "?, "
+                    + "?, "
+                    + "?)";
+
+            // create the mysql insert preparedstatement
+            PreparedStatement preparedStmt = con.prepareStatement(query, new String[]{"id"});
+            preparedStmt.setInt(1, remark.getType());
+            preparedStmt.setInt(2, remark.getRemarkId());
+            preparedStmt.setString(3, remark.getDescription());
+
+            return_value = preparedStmt.executeUpdate();
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.FINE, null, "Remarks Information ADDED!");
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        return return_value > 0;
+    }
+
+    public boolean createRemarks(int type, int remarks_id, String description) {
+        int return_value = 0;
+        try {
+            String query = "INSERT into remarks ("
+                    + "type, "
+                    + "remarks_id, "
+                    + "description "
+                    + ") values ("
+                    + "?, "
+                    + "?, "
+                    + "?)";
+
+            // create the mysql insert preparedstatement
+            PreparedStatement preparedStmt = con.prepareStatement(query, new String[]{"id"});
+            preparedStmt.setInt(1, type);
+            preparedStmt.setInt(2, remarks_id);
+            preparedStmt.setString(3, description);
+            return_value = preparedStmt.executeUpdate();
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.FINE, null, "Remarks Information ADDED!");
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        return return_value > 0;
+    }
+
+    // Fetch All
+    public ObservableList<Remark> getAllRemarkByRemarksId(int id) {
+        ObservableList<Remark> remarks = FXCollections.observableArrayList();
+        try {
+
+            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM remarks WHERE remarks_id='" + id + "'");
+            while (resultSet.next()) {
+                Remark remark = new Remark();
+
+                remark.setId(resultSet.getInt("id"));
+                remark.setType(resultSet.getInt("type"));
+                remark.setRemarkId(resultSet.getInt("remarks_id"));
+                remark.setDescription(resultSet.getString("description"));
+                remark.setDateCreated(resultSet.getString("created_at"));
+
+                remarks.add(remark);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+
+        }
+        return remarks;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // DB Update
     private void createUpdateTimeStamp() {

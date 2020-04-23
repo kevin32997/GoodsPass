@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="272.0" prefWidth="327.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.DialogPassGenerateReportCtrl">
+   <children>
+      <DatePicker fx:id="date_from" layoutX="54.0" layoutY="52.0" prefHeight="25.0" prefWidth="255.0" />
+      <DatePicker fx:id="date_until" layoutX="54.0" layoutY="87.0" prefHeight="25.0" prefWidth="255.0" />
+      <Label layoutX="14.0" layoutY="56.0" text="From" />
+      <Label layoutX="14.0" layoutY="91.0" text="Until" />
+      <Label layoutX="14.0" layoutY="15.0" text="Generate Passes Report">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <ProgressIndicator fx:id="progress" layoutX="140.0" layoutY="173.0" prefHeight="32.0" prefWidth="47.0" visible="false" />
+      <Button fx:id="btnGenerate" disable="true" layoutX="83.0" layoutY="223.0" mnemonicParsing="false" onAction="#onExportExcel" prefHeight="25.0" prefWidth="162.0" text="Generate Excel Report" />
+      <Label fx:id="label_info" layoutX="54.0" layoutY="156.0" prefHeight="17.0" prefWidth="255.0" style="-fx-text-fill: darkgreen;" text="Ready to Generate!" visible="false">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="124.0" text="Sort by Pass ID" />
+      <Button layoutX="206.0" layoutY="120.0" mnemonicParsing="false" onAction="#onDescending" prefHeight="25.0" prefWidth="79.0" text="Descending" />
+      <Button layoutX="108.0" layoutY="120.0" mnemonicParsing="false" onAction="#onAscending" prefHeight="25.0" prefWidth="79.0" text="Ascending" />
+   </children>
+</AnchorPane>

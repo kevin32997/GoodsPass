@@ -915,6 +915,29 @@ public class MainActivityController implements Initializable {
         });
     }
 
+    @FXML
+    void onGenerateReport(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_pass_generatereport_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+
+            Scene scene = new Scene(parent, 327, 272);
+            Stage stage = new Stage();
+
+            stage.setTitle("GENERATE PASS REPORT");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            DialogPassGenerateReportCtrl ctrl = (DialogPassGenerateReportCtrl) fxmlLoader.getController();
+            ctrl.setData(db);
+            stage.showAndWait();
+
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                       VIEW BUSINESS

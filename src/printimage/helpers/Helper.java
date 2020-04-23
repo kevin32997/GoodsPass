@@ -15,6 +15,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class Helper {
 
+
+
     public static String getMd5(String input) {
         try {
 

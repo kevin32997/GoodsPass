@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
@@ -32,6 +33,7 @@ import javafx.stage.Stage;
 import printimage.helpers.SQLDatabase;
 import printimage.models.BusinessInfo;
 import printimage.models.Goodspass;
+import printimage.models.Remark;
 
 /**
  * FXML Controller class
@@ -241,33 +243,68 @@ public class ViewBusinessInfoController implements Initializable {
             dialog_owner.requestFocus();
         } // Save
         else {
+            try {
+                Stage stage = new Stage();
 
-            businessInfo.setOwner(dialog_owner.getText());
-            businessInfo.setBusinessName(dialog_businessname.getText());
-            businessInfo.setAddress(dialog_address.getText());
-            businessInfo.setPermitNo(dialog_permit_no.getText());
-            businessInfo.setContact(dialog_contact_no.getText());
-            businessInfo.setContactPerson(dialog_contact_person.getText());
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+                Parent parent = fxmlLoader.load();
 
-            // Save to db
-            if (db.updateBusinessInfo_boolean(businessInfo)) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Update Success");
-                alert.setHeaderText("Information Updated!");
+                Scene scene = new Scene(parent, 477, 370);
+                stage.setTitle("Update Business Information");
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
 
-                alert.showAndWait();
-                db.updateDB();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Update Error");
-                alert.setHeaderText("Something went wrong!");
-                alert.setContentText("Please check server connection!");
-                alert.showAndWait();
-                db.updateDB();
+                TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+                Button btnSave = (Button) parent.lookup("#btnSave");
+                Button btnCancel = (Button) parent.lookup("#btnCancel");
+
+                btnSave.setOnAction(e -> {
+
+                    // Update business Info
+                    businessInfo.setOwner(dialog_owner.getText());
+                    businessInfo.setBusinessName(dialog_businessname.getText());
+                    businessInfo.setAddress(dialog_address.getText());
+                    businessInfo.setPermitNo(dialog_permit_no.getText());
+                    businessInfo.setContact(dialog_contact_no.getText());
+                    businessInfo.setContactPerson(dialog_contact_person.getText());
+
+                    // Save to db
+                    if (db.updateBusinessInfo_boolean(businessInfo)) {
+                        if (descriptionText.getText().equals("")) {
+                            db.createRemarks(Remark.REMARK_BUSINESS, businessInfo.getId(), "BUSINESS INFORMATION UPDATED");
+                        } else {
+                            db.createRemarks(Remark.REMARK_BUSINESS, businessInfo.getId(), descriptionText.getText());
+                        }
+
+                        db.updateDB();
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Update Success");
+                        alert.setHeaderText("Information Updated!");
+                        alert.showAndWait();
+                        stage.close();
+
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Update Error");
+                        alert.setHeaderText("Something went wrong!");
+                        alert.setContentText("Please check server connection!");
+                        alert.showAndWait();
+                    }
+                    btnEdit.setText("Edit");
+                    btnClose.setText("Close");
+                    fieldsEnable(false);
+                });
+
+                btnCancel.setOnAction(e -> {
+                    stage.close();
+                });
+
+                stage.show();
+
+            } catch (IOException ex) {
+                Logger.getLogger(ViewBusinessInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            btnEdit.setText("Edit");
-            btnClose.setText("Close");
-            fieldsEnable(false);
         }
     }
 

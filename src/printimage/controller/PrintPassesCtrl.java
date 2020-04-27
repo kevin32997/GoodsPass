@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -111,7 +113,7 @@ public class PrintPassesCtrl implements Initializable {
                 ProgressIndicator progress = (ProgressIndicator) parent.lookup("#item_progress");
 
                 label.setText(pass.getGpNo() + " - " + pass.getBusinessName());
-            
+
                 list_view.getItems().add(parent);
 
             } catch (IOException ex) {
@@ -119,7 +121,6 @@ public class PrintPassesCtrl implements Initializable {
             }
         }
     }
-
 
     private void printPass(Goodspass pass, ProgressIndicator progress) {
         new Thread(() -> {
@@ -501,10 +502,7 @@ public class PrintPassesCtrl implements Initializable {
     private void updatePassInfo(Goodspass pass) {
         new Thread(() -> {
             if (!pass.getStatus().equals("1")) {
-                pass.setStatus("1");
-                java.util.Date dateToday = new java.util.Date();
-                pass.setDate_sql(new Date(dateToday.getTime()));
-                db.updatePassInfo(pass);
+                db.updatePassInfoPrinted(pass);
             }
 
         }).start();

@@ -5,6 +5,8 @@
  */
 package printimage.models;
 
+import java.sql.Date;
+
 /**
  *
  * @author Admin
@@ -21,6 +23,8 @@ public class Passes {
     private String ctrlNo;
     private String status;
     private String date_printed;
+
+    
 
     public Passes() {
     }
@@ -97,12 +101,9 @@ public class Passes {
         this.status = status;
     }
 
-    public String getDate_printed() {
-        return date_printed;
+    @Override
+    public String toString() {
+        return "Passes{" + "businessName=" + businessName + ", address=" + address + ", plateNo=" + plateNo + ", description=" + description + ", designation_1=" + designation_1 + ", designation_2=" + designation_2 + ", qrCode=" + qrCode + ", ctrlNo=" + ctrlNo + ", status=" + status + ", date_printed=" + date_printed + '}';
     }
-
-
-    
-    
 
 }

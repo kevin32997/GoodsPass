@@ -1336,8 +1336,14 @@ public class MainActivityController implements Initializable {
         }
 
         crewInfo_pagination.setCurrentPageIndex(this.table_crew_current_page);
-        crewInfo_pagination.setMaxPageIndicatorCount(pageCount);
+
         crewInfo_pagination.setPageCount(pageCount);
+
+        if (pageCount > 50) {
+            crewInfo_pagination.setMaxPageIndicatorCount(50);
+        } else {
+            crewInfo_pagination.setMaxPageIndicatorCount(pageCount);
+        }
 
         crewInfo_pagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             crewInfo_pagination.setCurrentPageIndex(newIndex.intValue());
@@ -1677,14 +1683,14 @@ public class MainActivityController implements Initializable {
             BusinessInfo businessInfo = db.getBusinessInfoByPermitNo(info.getBusinessId());
             info.setBusinessId("" + businessInfo.getId());
 
-            if (!info.getDate_printed().equals("")) {
+            if (!info.getDatePrinted().equals("")) {
                 info.setStatus("" + STATUS_PRINTED);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
                 try {
-                    java.util.Date date = dateFormat.parse(info.getDate_printed());
+                    java.util.Date date = dateFormat.parse(info.getDatePrinted());
                     Date sqlDate = new Date(date.getTime());
-                    info.setDate_sql(sqlDate);
+                    //info.setDate_sql(sqlDate);
 
                 } catch (ParseException ex) {
                     Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);

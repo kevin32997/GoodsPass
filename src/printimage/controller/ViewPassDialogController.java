@@ -27,6 +27,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -68,6 +69,9 @@ public class ViewPassDialogController implements Initializable {
     private TextField dialog_plateNo;
 
     @FXML
+    private TextField dialog_dateCreated;
+
+    @FXML
     private TextField dialog_businessName;
 
     @FXML
@@ -95,26 +99,41 @@ public class ViewPassDialogController implements Initializable {
     private TableView<Crew> main_table;
 
     @FXML
+    private TableView<Remark> remarks_table;
+
+    @FXML
     private TableColumn<Crew, String> tableColumn_name;
 
     @FXML
     private TableColumn<Crew, String> tableColumn_designation;
 
     @FXML
+    private TableColumn<Remark, String> remarkColumn_description;
+
+    @FXML
+    private TableColumn<Remark, String> remarkColumn_date;
+
+    @FXML
     private ListView dialog_search_list;
 
     private Goodspass info;
-    private ObservableList<Crew> crews;
+
     private SQLDatabase db;
     private Stage stage;
     private BusinessInfo businessInfo;
     private ViewBusinessInfoController ctrl;
 
     private ObservableList<BusinessInfo> searchedBusinessList;
+    private ObservableList<Crew> crews;
+    private ObservableList<Remark> remarks;
+
+    private SimpleDateFormat df;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+
+        df = new SimpleDateFormat("MMMMM dd,yyyy hh:mm:ss");
         initFields();
     }
 
@@ -182,12 +201,15 @@ public class ViewPassDialogController implements Initializable {
         this.db = db;
         info = db.getPassInfoById(id);
 
+        System.out.println("Date Printed: " + info.getSqlDatePrinted());
+
         businessInfo = db.getBusinessInfoById(Integer.parseInt(info.getBusinessId()));
         if (businessInfo == null) {
             businessInfo = new BusinessInfo();
         }
 
         crews = db.getAllCrewByGPNo(info.getGpNo());
+        remarks = db.getAllRemarkByRemarksId(this.info.getId());
 
         setFields();
         setupTable();
@@ -199,8 +221,8 @@ public class ViewPassDialogController implements Initializable {
         this.dialog_plateNo.setText(info.getVehiclePlateNo());
         this.dialog_businessName.setText(businessInfo.getBusinessName());
         this.dialog_address.setText(businessInfo.getAddress());
-        checkIfPrinted();
-
+        this.dialog_dateCreated.setText(df.format(info.getSqlDateCreated()));
+        checkPassData();
     }
 
     public void setCtrl(ViewBusinessInfoController ctrl) {
@@ -209,53 +231,63 @@ public class ViewPassDialogController implements Initializable {
 
     private int viewtype = 0;
 
-    private void checkIfPrinted() {
+    private void checkPassData() {
 
-        if (info.getStatus().equals("" + MainActivityController.STATUS_PRINTED) || info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
-            try {
+        if (info.getStatus().equals("" + MainActivityController.STATUS_PRINTED) || info.getStatus().equals("" + MainActivityController.STATUS_HOLD) && info.getSqlDatePrinted() != null) {
 
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                java.util.Date dateToday = new java.util.Date();
-                java.util.Date datePrinted = df.parse(info.getDate_printed());
+            java.util.Date dateToday = new java.util.Date();
 
-                Calendar calPrinted = Calendar.getInstance();
-                Calendar calToday = Calendar.getInstance();
+            java.util.Date datePrinted = new java.util.Date(info.getSqlDatePrinted().getTime());
 
-                calPrinted.setTime(datePrinted);
-                calToday.setTime(dateToday);
+            Calendar calPrinted = Calendar.getInstance();
+            Calendar calToday = Calendar.getInstance();
 
-                boolean samedate = calPrinted.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
-                        && calPrinted.get(Calendar.YEAR) == calToday.get(Calendar.YEAR);
+            calPrinted.setTime(datePrinted);
+            calToday.setTime(dateToday);
 
-                if (samedate) {
-                    viewtype = ViewCrewDialogController.FORM_EDIT;
-                } else {
-                    btnEdit.setVisible(false);
-                    btnEdit.setDisable(true);
+            boolean samedate = calPrinted.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
+                    && calPrinted.get(Calendar.YEAR) == calToday.get(Calendar.YEAR);
 
-                    btnDelete.setVisible(false);
-                    btnDelete.setDisable(true);
+            if (samedate) {
+                viewtype = ViewCrewDialogController.FORM_EDIT;
+            } else {
+                btnEdit.setVisible(false);
+                btnEdit.setDisable(true);
 
-                    btnHold.setVisible(false);
-                    btnHold.setDisable(true);
+                btnDelete.setVisible(false);
+                btnDelete.setDisable(true);
 
-                    btnAdd.setVisible(false);
-                    btnAdd.setDisable(true);
-                    viewtype = ViewCrewDialogController.FORM_VIEW;
-                }
+                btnHold.setVisible(false);
+                btnHold.setDisable(true);
 
-                if (info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
-                    btnHold.setText("Approve");
-                    dialog_date_printed.setText(info.getDate_printed() + " - CANCELLED");
-                } else {
-                    btnHold.setText("Cancel");
-                    dialog_date_printed.setText(info.getDate_printed());
-                }
-            } catch (ParseException ex) {
-                Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
+                btnAdd.setVisible(false);
+                btnAdd.setDisable(true);
+                viewtype = ViewCrewDialogController.FORM_VIEW;
             }
-        } else {
 
+            if (info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
+                btnHold.setText("Approve");
+                dialog_date_printed.setText(this.df.format(info.getDatePrinted()) + " - CANCELLED");
+            } else {
+                btnHold.setText("Cancel");
+
+                dialog_date_printed.setText(this.df.format(info.getSqlDatePrinted()));
+            }
+
+        } else if (info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
+
+            viewtype = ViewCrewDialogController.FORM_EDIT;
+            btnHold.setText("Approve");
+            if (info.getSqlDatePrinted() == null) {
+                dialog_date_printed.setText("NOT PRINTED.");
+            } else {
+
+                dialog_date_printed.setText(this.df.format(info.getSqlDatePrinted()) + " - CANCELLED");
+
+            }
+
+        } else {
+            btnHold.setText("Cancel");
             viewtype = ViewCrewDialogController.FORM_EDIT;
             dialog_date_printed.setText("NOT PRINTED.");
         }
@@ -264,7 +296,7 @@ public class ViewPassDialogController implements Initializable {
     private void setupTable() {
         this.tableColumn_name.setCellValueFactory(new PropertyValueFactory<Crew, String>("fullname"));
         this.tableColumn_designation.setCellValueFactory(new PropertyValueFactory<Crew, String>("designation"));
-        loadTableData();
+
         main_table.setRowFactory(tv -> {
             TableRow<Crew> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -275,11 +307,31 @@ public class ViewPassDialogController implements Initializable {
 
             return row;
         });
+
+        this.remarkColumn_description.setCellValueFactory(new PropertyValueFactory<Remark, String>("description"));
+        this.remarkColumn_date.setCellValueFactory(new PropertyValueFactory<Remark, String>("dateCreated"));
+
+        remarks_table.setRowFactory(tv -> {
+            TableRow<Remark> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && (!row.isEmpty())) {
+                    openRemarksInformationDialog(row.getItem());
+                }
+            });
+
+            return row;
+        });
+
+        loadTableData();
+
     }
 
     private void loadTableData() {
         this.main_table.getItems().clear();
         this.main_table.getItems().addAll(crews);
+
+        this.remarks_table.getItems().clear();
+        this.remarks_table.getItems().addAll(remarks);
     }
 
     private void fieldsEnable(boolean enable) {
@@ -295,18 +347,18 @@ public class ViewPassDialogController implements Initializable {
         loadTableData();
     }
 
+    public void refreshRemarksList() {
+        remarks = db.getAllRemarkByRemarksId(info.getId());
+        loadTableData();
+    }
+
     public void updatePass() {
 
         if (!info.getStatus().equals("1")) {
-            info.setStatus("" + MainActivityController.STATUS_PRINTED);
-            java.util.Date date_today = new java.util.Date();
-            Date sqlDate = new Date(date_today.getTime());
-            info.setDate_sql(sqlDate);
-            info.setDate_printed(sqlDate.toString());
-            db.updatePassInfo(info);
+            db.updatePassInfoPrinted(info);
             db.updateDB();
         }
-        this.checkIfPrinted();
+        this.checkPassData();
 
         // if this dialog came from business dialog
         if (ctrl != null) {
@@ -324,7 +376,7 @@ public class ViewPassDialogController implements Initializable {
             alert.showAndWait();
             db.updateDB();
         }
-        this.checkIfPrinted();
+        this.checkPassData();
 
         // if this dialog came from business dialog
         if (ctrl != null) {
@@ -334,11 +386,11 @@ public class ViewPassDialogController implements Initializable {
 
     public void approvePass() {
 
-        if (info.getDate_printed() != null) {
+        if (info.getDatePrinted() != null) {
             info.setStatus("" + MainActivityController.STATUS_PRINTED);
             if (db.updatePassInfo(info)) {
                 Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Update Success");
+                alert.setTitle("Update Successfull");
                 alert.setHeaderText("Goodspass has been approved.");
                 alert.showAndWait();
                 db.updateDB();
@@ -346,19 +398,124 @@ public class ViewPassDialogController implements Initializable {
         } else {
             info.setStatus("" + MainActivityController.STATUS_PENDING);
             if (db.updatePassInfo(info)) {
-                Alert alert = new Alert(AlertType.ERROR);
-                alert.setTitle("Update Success");
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Update Successfull");
                 alert.setHeaderText("Goodspass has been approved.");
                 alert.showAndWait();
                 db.updateDB();
             }
         }
 
-        this.checkIfPrinted();
+        this.checkPassData();
 
         // if this dialog came from business dialog
         if (ctrl != null) {
             ctrl.loadData();
+        }
+    }
+
+    private void openIDPreview(Passes pass) {
+        AnchorPane root;
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/layout_to_print.fxml"));
+        try {
+            root = loader.load();
+            Scene scene = new Scene(root, 849, 714);
+            Stage stage = new Stage();
+            stage.setTitle("Preview");
+            stage.setScene(scene);
+
+            // Hide this current window (if this is what you want)
+            PrintLayoutController ctrl = (PrintLayoutController) loader.getController();
+            ctrl.setPasses(pass);
+            ctrl.setStage(stage);
+            ctrl.setCtrl(this);
+
+            // Show Window
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void openAddCrewInformationDialog() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/create_crew_dialog_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            CreateCrewDialogCtrl ctrl = (CreateCrewDialogCtrl) fxmlLoader.getController();
+
+            Scene scene = new Scene(parent, 400, 321);
+            Stage stage = new Stage();
+            stage.setTitle("Add Crew");
+            stage.setResizable(false);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            ctrl.setStage(stage);
+            ctrl.setData(db, info);
+            ctrl.setCtrl(this);
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void openViewCrewInfoDialog(Crew crew) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_crew_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            ViewCrewDialogController ctrl = (ViewCrewDialogController) fxmlLoader.getController();
+
+            Scene scene = new Scene(parent, 434, 385);
+            Stage stage = new Stage();
+            stage.setTitle(this.info.getGpNo() + " - " + crew.getFullname());
+            stage.setResizable(false);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            ctrl.setData(stage, db, crew.getId());
+            ctrl.setViewType(viewtype);
+            ctrl.setCtrl(this);
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void openRemarksInformationDialog(Remark remark) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_remarks_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+
+            Scene scene = new Scene(parent, 478, 342);
+            Stage stage = new Stage();
+            stage.setTitle("Remarks - " + info.getGpNo());
+            stage.setResizable(false);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            Label remarksOf = (Label) parent.lookup("#remarks_of");
+            Label dateCreated = (Label) parent.lookup("#date_created");
+            TextArea textArea = (TextArea) parent.lookup("#text_area");
+            Button btnClose = (Button) parent.lookup("#btnClose");
+
+            remarksOf.setText("Remarks of: " + info.getGpNo());
+            dateCreated.setText("Date Create: " + remark.getDateCreated());
+            textArea.setText(remark.getDescription());
+
+            btnClose.setOnAction(e -> {
+                stage.close();
+            });
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -397,7 +554,7 @@ public class ViewPassDialogController implements Initializable {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
                 Parent parent = fxmlLoader.load();
 
-                Scene scene = new Scene(parent, 477, 370);
+                Scene scene = new Scene(parent, 470, 370);
                 stage.setTitle("Update Goodspass");
                 stage.setScene(scene);
                 stage.initModality(Modality.APPLICATION_MODAL);
@@ -428,6 +585,7 @@ public class ViewPassDialogController implements Initializable {
                         alert.setHeaderText("Information Updated!");
                         alert.showAndWait();
                         stage.close();
+                        this.refreshRemarksList();
                     }
 
                     btnEdit.setText("Edit");
@@ -579,76 +737,50 @@ public class ViewPassDialogController implements Initializable {
 
     }
 
-    private void openIDPreview(Passes pass) {
-        AnchorPane root;
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/layout_to_print.fxml"));
+    @FXML
+    void onAddRemarks(ActionEvent event) {
         try {
-            root = loader.load();
-            Scene scene = new Scene(root, 849, 714);
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+            Parent parent = fxmlLoader.load();
             Stage stage = new Stage();
-            stage.setTitle("Preview");
+            Scene scene = new Scene(parent, 470, 370);
+
+            stage.setTitle("Add Remarks");
             stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
 
-            // Hide this current window (if this is what you want)
-            PrintLayoutController ctrl = (PrintLayoutController) loader.getController();
-            ctrl.setPasses(pass);
-            ctrl.setStage(stage);
-            ctrl.setCtrl(this);
+            TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+            Button btnSave = (Button) parent.lookup("#btnSave");
+            Button btnCancel = (Button) parent.lookup("#btnCancel");
 
-            // Show Window
+            btnSave.setOnAction(e -> {
+
+                if (descriptionText.getText().equals("")) {
+                    Alert alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Please add description to save!");
+                    alert.showAndWait();
+                } else {
+                    if (db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText())) {
+                        db.updateDB();
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Updated");
+                        alert.setHeaderText("Remarks Added!");
+                        alert.showAndWait();
+                        stage.close();
+                        this.refreshRemarksList();
+                    }
+                }
+            });
+
+            btnCancel.setOnAction(e -> {
+                stage.close();
+            });
+
             stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void openAddCrewInformationDialog() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/create_crew_dialog_layout.fxml"));
-            Parent parent = fxmlLoader.load();
-            CreateCrewDialogCtrl ctrl = (CreateCrewDialogCtrl) fxmlLoader.getController();
-
-            Scene scene = new Scene(parent, 400, 321);
-            Stage stage = new Stage();
-            stage.setTitle("Add Crew");
-            stage.setResizable(false);
-
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-
-            ctrl.setStage(stage);
-            ctrl.setData(db, info);
-            ctrl.setCtrl(this);
-
-            stage.showAndWait();
         } catch (IOException ex) {
-            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void openViewCrewInfoDialog(Crew crew) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_crew_layout.fxml"));
-            Parent parent = fxmlLoader.load();
-            ViewCrewDialogController ctrl = (ViewCrewDialogController) fxmlLoader.getController();
-
-            Scene scene = new Scene(parent, 434, 385);
-            Stage stage = new Stage();
-            stage.setTitle(this.info.getGpNo() + " - " + crew.getFullname());
-            stage.setResizable(false);
-
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-
-            ctrl.setData(stage, db, crew.getId());
-            ctrl.setViewType(viewtype);
-            ctrl.setCtrl(this);
-
-            stage.showAndWait();
-        } catch (IOException ex) {
-            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

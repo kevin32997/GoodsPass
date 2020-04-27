@@ -216,7 +216,7 @@ public class DialogPassGenerateReportCtrl implements Initializable {
                 new_row.createCell(4).setCellValue(bInfo.getAddress());
 
                 if (pass.getStatus().equals("" + MainActivityController.STATUS_PRINTED)) {
-                    new_row.createCell(5).setCellValue(pass.getDate_printed());
+                    new_row.createCell(5).setCellValue(pass.getDatePrinted());
                 } else {
                     new_row.createCell(5).setCellValue("Not Released");
                 }

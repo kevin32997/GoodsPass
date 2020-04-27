@@ -6,6 +6,7 @@
 package printimage.models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -27,8 +28,11 @@ public class Goodspass {
     private String businessAddress;
 
     private String status;
-    private String date_printed;
-    private Date date_sql;
+    private String datePrinted;
+    private String dateCreated;
+
+    private Timestamp sqlDatePrinted;
+    private Timestamp sqlDateCreated;
 
     public Goodspass() {
     }
@@ -81,20 +85,12 @@ public class Goodspass {
         this.status = status;
     }
 
-    public String getDate_printed() {
-        return date_printed;
+    public String getDatePrinted() {
+        return datePrinted;
     }
 
-    public void setDate_printed(String date_printed) {
-        this.date_printed = date_printed;
-    }
-
-    public Date getDate_sql() {
-        return date_sql;
-    }
-
-    public void setDate_sql(Date date_sql) {
-        this.date_sql = date_sql;
+    public void setDatePrinted(String date_printed) {
+        this.datePrinted = date_printed;
     }
 
     public String getGpNo() {
@@ -113,9 +109,28 @@ public class Goodspass {
         this.businessAddress = businessAddress;
     }
 
-    @Override
-    public String toString() {
-        return "Goodspass{" + "id=" + id + ", gpNo=" + gpNo + ", vehicleDesc=" + vehicleDesc + ", vehiclePlateNo=" + vehiclePlateNo + ", businessId=" + businessId + ", businessName=" + businessName + ", businessAddress=" + businessAddress + ", status=" + status + ", date_printed=" + date_printed + ", date_sql=" + date_sql + '}';
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Timestamp getSqlDatePrinted() {
+        return sqlDatePrinted;
+    }
+
+    public void setSqlDatePrinted(Timestamp sqlDatePrinted) {
+        this.sqlDatePrinted = sqlDatePrinted;
+    }
+
+    public Timestamp getSqlDateCreated() {
+        return sqlDateCreated;
+    }
+
+    public void setSqlDateCreated(Timestamp sqlDateCreated) {
+        this.sqlDateCreated = sqlDateCreated;
     }
 
 }

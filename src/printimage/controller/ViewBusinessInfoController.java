@@ -21,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -81,11 +82,21 @@ public class ViewBusinessInfoController implements Initializable {
     @FXML
     private TableColumn<Goodspass, String> dialog_tablerow_printed;
 
+    @FXML
+    private TableView<Remark> dialog_remarks_table;
+
+    @FXML
+    private TableColumn<Remark, String> remarks_date;
+
+    @FXML
+    private TableColumn<Remark, String> remarks_description;
+
     private Stage stage;
     private BusinessInfo businessInfo;
     private SQLDatabase db;
 
     private ObservableList<Goodspass> passes;
+    private ObservableList<Remark> remarks;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -107,6 +118,70 @@ public class ViewBusinessInfoController implements Initializable {
 
             return row;
         });
+        this.remarks_date.setCellValueFactory(new PropertyValueFactory<Remark, String>("dateCreated"));
+        this.remarks_description.setCellValueFactory(new PropertyValueFactory<Remark, String>("description"));
+        this.dialog_remarks_table.setRowFactory(tv -> {
+            TableRow<Remark> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && (!row.isEmpty())) {
+                    openViewRemarksDialog(row.getItem());
+                }
+            });
+
+            return row;
+        });
+
+    }
+
+    public void setData(Stage stage, SQLDatabase db, int id) {
+        this.stage = stage;
+
+        this.stage.getScene().setOnKeyReleased(e -> {
+            KeyCode code = e.getCode();
+            if (code == KeyCode.ESCAPE) {
+                stage.close();
+            }
+        });
+
+        this.db = db;
+        businessInfo = db.getBusinessInfoById(id);
+        loadData();
+        setFields();
+    }
+
+    public void loadData() {
+        this.dialog_main_table.getItems().clear();
+        this.dialog_remarks_table.getItems().clear();
+        passes = db.getAllPassesByBusinessId(businessInfo.getId());
+        remarks = db.getAllRemarkByRemarksId(businessInfo.getId());
+
+        for (Goodspass driver : passes) {
+            if (driver.getDatePrinted() == null || driver.getDatePrinted().equals("")) {
+                driver.setDatePrinted("Not Printed");
+            }
+        }
+        this.dialog_main_table.setItems(passes);
+        this.dialog_remarks_table.setItems(remarks);
+    }
+
+    private void setFields() {
+        this.dialog_owner.setText(businessInfo.getOwner());
+        this.dialog_businessname.setText(businessInfo.getBusinessName());
+        this.dialog_address.setText(businessInfo.getAddress());
+        this.dialog_permit_no.setText(businessInfo.getPermitNo());
+        this.dialog_contact_no.setText(businessInfo.getContact());
+        this.dialog_contact_person.setText(businessInfo.getContactPerson());
+
+    }
+
+    private void fieldsEnable(boolean enable) {
+        this.dialog_owner.setEditable(enable);
+        this.dialog_businessname.setEditable(enable);
+        this.dialog_address.setEditable(enable);
+        this.dialog_permit_no.setEditable(enable);
+        this.dialog_contact_no.setEditable(enable);
+        this.dialog_contact_person.setEditable(enable);
+
     }
 
     private void openViewDriverDialog(Goodspass pass) {
@@ -131,52 +206,37 @@ public class ViewBusinessInfoController implements Initializable {
         }
     }
 
-    public void setData(Stage stage, SQLDatabase db, int id) {
-        this.stage = stage;
+    private void openViewRemarksDialog(Remark remark) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_remarks_layout.fxml"));
+            Parent parent = fxmlLoader.load();
 
-        this.stage.getScene().setOnKeyReleased(e -> {
-            KeyCode code = e.getCode();
-            if (code == KeyCode.ESCAPE) {
+            Stage stage = new Stage();
+            Scene scene = new Scene(parent, 475, 340);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.setTitle("Remarks - " + businessInfo.getBusinessName());
+            stage.setResizable(false);
+
+            Label remarksOf = (Label) parent.lookup("#remarks_of");
+            Label dateCreated = (Label) parent.lookup("#date_created");
+            TextArea textArea = (TextArea) parent.lookup("#text_area");
+            Button btnClose = (Button) parent.lookup("#btnClose");
+
+            remarksOf.setText("Remarks of: " + businessInfo.getBusinessName());
+            dateCreated.setText("Date Created: " + remark.getDateCreated());
+            textArea.setText(remark.getDescription());
+            textArea.setWrapText(true);
+
+            btnClose.setOnAction(e -> {
                 stage.close();
-            }
-        });
+            });
 
-        this.db = db;
-        businessInfo = db.getBusinessInfoById(id);
-        loadData();
-        setFields();
-    }
-
-    public void loadData() {
-        this.dialog_main_table.getItems().clear();
-        passes = db.getAllPassesByBusinessId(businessInfo.getId());
-
-        for (Goodspass driver : passes) {
-            if (driver.getDate_printed() == null || driver.getDate_printed().equals("")) {
-                driver.setDate_printed("Not Printed");
-            }
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.dialog_main_table.setItems(passes);
-    }
-
-    private void setFields() {
-        this.dialog_owner.setText(businessInfo.getOwner());
-        this.dialog_businessname.setText(businessInfo.getBusinessName());
-        this.dialog_address.setText(businessInfo.getAddress());
-        this.dialog_permit_no.setText(businessInfo.getPermitNo());
-        this.dialog_contact_no.setText(businessInfo.getContact());
-        this.dialog_contact_person.setText(businessInfo.getContactPerson());
-
-    }
-
-    private void fieldsEnable(boolean enable) {
-        this.dialog_owner.setEditable(enable);
-        this.dialog_businessname.setEditable(enable);
-        this.dialog_address.setEditable(enable);
-        this.dialog_permit_no.setEditable(enable);
-        this.dialog_contact_no.setEditable(enable);
-        this.dialog_contact_person.setEditable(enable);
-
     }
 
     @FXML
@@ -201,7 +261,6 @@ public class ViewBusinessInfoController implements Initializable {
             alert.setTitle("Delete Warning!");
             alert.setHeaderText("Can't Delete Data!");
             alert.setContentText("There are other data that is associated with this data, this could make the app crash!");
-
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK) {
 
@@ -283,6 +342,7 @@ public class ViewBusinessInfoController implements Initializable {
                         alert.setHeaderText("Information Updated!");
                         alert.showAndWait();
                         stage.close();
+                        this.loadData();
 
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -305,6 +365,52 @@ public class ViewBusinessInfoController implements Initializable {
             } catch (IOException ex) {
                 Logger.getLogger(ViewBusinessInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+
+    @FXML
+    void onAddRemarks(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+
+            Stage stage = new Stage();
+            Scene scene = new Scene(parent, 477, 370);
+            stage.setTitle("Add Remarks");
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+
+            TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+            Button btnSave = (Button) parent.lookup("#btnSave");
+            Button btnCancel = (Button) parent.lookup("#btnCancel");
+
+            btnSave.setOnAction(e -> {
+                if (descriptionText.getText().equals("")) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Please add description to save!");
+                    alert.setContentText(null);
+                    alert.showAndWait();
+                } else {
+                    if (db.createRemarks(Remark.REMARK_BUSINESS, businessInfo.getId(), descriptionText.getText())) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Update Success");
+                        alert.setHeaderText("Information Updated!");
+                        alert.showAndWait();
+                        stage.close();
+                        this.loadData();
+                    }
+                }
+            });
+
+            btnCancel.setOnAction(e -> {
+                stage.close();
+            });
+
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(ViewBusinessInfoController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

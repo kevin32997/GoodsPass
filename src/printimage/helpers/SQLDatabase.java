@@ -114,25 +114,12 @@ public class SQLDatabase {
     public boolean updatePassInfo(Goodspass info) {
 
         try {
-            String query = "";
-            if (info.getDate_sql() != null) {
-                query = "UPDATE passes SET "
-                        + "gp_no = ?, "
-                        + "vehicle_desc = ?, "
-                        + "vehicle_plate_no = ?, "
-                        + "business_id = ?, "
-                        + "status = ?, "
-                        + "date_printed = ? "
-                        + "WHERE id = ?";
-            } else {
-                query = "UPDATE passes SET "
-                        + "gp_no = ?, "
-                        + "vehicle_desc = ?, "
-                        + "vehicle_plate_no = ?, "
-                        + "business_id = ?, "
-                        + "status = ? "
-                        + "WHERE id = ?";
-            }
+            String query = "UPDATE passes SET "
+                    + "gp_no = ?, "
+                    + "vehicle_desc = ?, "
+                    + "vehicle_plate_no = ?, "
+                    + "business_id = ?, "
+                    + "status = ? ";
 
             PreparedStatement ps = con.prepareStatement(query);
 
@@ -140,15 +127,8 @@ public class SQLDatabase {
             ps.setString(2, info.getVehicleDesc());
             ps.setString(3, info.getVehiclePlateNo());
             ps.setString(4, info.getBusinessId());
-
             ps.setInt(5, Integer.parseInt(info.getStatus()));
 
-            if (info.getDate_sql() != null) {
-                ps.setDate(6, info.getDate_sql());
-                ps.setInt(7, info.getId());
-            } else {
-                ps.setInt(6, info.getId());
-            }
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -161,6 +141,20 @@ public class SQLDatabase {
             return false;
         }
         return true;
+    }
+
+    public void updatePassInfoPrinted(Goodspass pass) {
+        String sql = "UPDATE passes SET status = ?, date_printed = ? WHERE id = ?";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, "1");
+            ps.setTimestamp(2, getCurrentTimeStamp());
+            ps.setInt(3, pass.getId());
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            this.showError(ex);
+        }
     }
 
     // Update
@@ -185,12 +179,6 @@ public class SQLDatabase {
             ps.setString(4, info.getBusinessId());
             ps.setString(5, info.getBusinessName());
             ps.setInt(6, Integer.parseInt(info.getStatus()));
-
-            if (info.getDate_sql() != null) {
-                ps.setDate(7, info.getDate_sql());
-            } else {
-                ps.setDate(7, null);
-            }
 
             ps.setInt(8, info.getId());
 
@@ -246,7 +234,8 @@ public class SQLDatabase {
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setBusinessName(resultSet.getString("business_name"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDate_printed(resultSet.getString("date_printed"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -273,7 +262,8 @@ public class SQLDatabase {
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setBusinessName(resultSet.getString("business_name"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDate_printed(resultSet.getString("date_printed"));
+                pass.setDatePrinted(resultSet.getString("date_printed"));
+                pass.setDateCreated(resultSet.getString("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -299,6 +289,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -314,14 +306,16 @@ public class SQLDatabase {
 
             ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes WHERE " + searchby + " LIKE '%" + start + "%' limit " + limit);
             while (resultSet.next()) {
-                Goodspass driver = new Goodspass();
-                driver.setId(resultSet.getInt("id"));
-                driver.setGpNo(resultSet.getString("gp_no"));
-                driver.setVehicleDesc(resultSet.getString("vehicle_desc"));
-                driver.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
-                driver.setBusinessId(resultSet.getString("business_id"));
-                driver.setStatus(resultSet.getString("status"));
-                passes.add(driver);
+                Goodspass pass = new Goodspass();
+                pass.setId(resultSet.getInt("id"));
+                pass.setGpNo(resultSet.getString("gp_no"));
+                pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
+                pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
+                pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setStatus(resultSet.getString("status"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
+                passes.add(pass);
             }
         } catch (SQLException ex) {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
@@ -343,6 +337,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -358,14 +354,16 @@ public class SQLDatabase {
         try {
             ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes ORDER BY id limit " + offset + "," + count + "");
             while (resultSet.next()) {
-                Goodspass driver = new Goodspass();
-                driver.setId(resultSet.getInt("id"));
-                driver.setGpNo(resultSet.getString("gp_no"));
-                driver.setVehicleDesc(resultSet.getString("vehicle_desc"));
-                driver.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
-                driver.setBusinessId(resultSet.getString("business_id"));
-                driver.setStatus(resultSet.getString("status"));
-                drivers.add(driver);
+                Goodspass pass = new Goodspass();
+                pass.setId(resultSet.getInt("id"));
+                pass.setGpNo(resultSet.getString("gp_no"));
+                pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
+                pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
+                pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setStatus(resultSet.getString("status"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
+                drivers.add(pass);
             }
         } catch (SQLException ex) {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
@@ -381,15 +379,16 @@ public class SQLDatabase {
 
             ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes WHERE business_id='" + businessId + "'");
             while (resultSet.next()) {
-                Goodspass driver = new Goodspass();
-                driver.setId(resultSet.getInt("id"));
-                driver.setGpNo(resultSet.getString("gp_no"));
-                driver.setVehicleDesc(resultSet.getString("vehicle_desc"));
-                driver.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
-                driver.setBusinessId(resultSet.getString("business_id"));
-                driver.setStatus(resultSet.getString("status"));
-                driver.setDate_printed(resultSet.getString("date_printed"));
-                drivers.add(driver);
+                Goodspass pass = new Goodspass();
+                pass.setId(resultSet.getInt("id"));
+                pass.setGpNo(resultSet.getString("gp_no"));
+                pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
+                pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
+                pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setStatus(resultSet.getString("status"));
+                pass.setDatePrinted(resultSet.getString("date_printed"));
+                pass.setDateCreated(resultSet.getString("created_at"));
+                drivers.add(pass);
             }
 
         } catch (SQLException ex) {
@@ -405,16 +404,17 @@ public class SQLDatabase {
 
             ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes");
             while (resultSet.next()) {
-                Goodspass driver = new Goodspass();
-                driver.setId(resultSet.getInt("id"));
-                driver.setGpNo(resultSet.getString("gp_no"));
-                driver.setVehicleDesc(resultSet.getString("vehicle_desc"));
-                driver.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
-                driver.setBusinessId(resultSet.getString("business_id"));
-                driver.setStatus(resultSet.getString("status"));
-                drivers.add(driver);
+                Goodspass pass = new Goodspass();
+                pass.setId(resultSet.getInt("id"));
+                pass.setGpNo(resultSet.getString("gp_no"));
+                pass.setVehicleDesc(resultSet.getString("vehicle_desc"));
+                pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
+                pass.setBusinessId(resultSet.getString("business_id"));
+                pass.setStatus(resultSet.getString("status"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
+                drivers.add(pass);
             }
-
         } catch (SQLException ex) {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -435,7 +435,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDate_printed(resultSet.getString("date_printed"));
+                pass.setDatePrinted(resultSet.getString("date_printed"));
+                pass.setDateCreated(resultSet.getString("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -447,7 +448,7 @@ public class SQLDatabase {
     public ObservableList<Goodspass> getPassByDateOperation(String date, String operation, String sort_type) {
         ObservableList<Goodspass> passes = FXCollections.observableArrayList();
         try {
- 
+
             ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes WHERE date(created_at) " + operation + " '" + date + "' ORDER BY gp_no " + sort_type + "");
 
             while (resultSet.next()) {
@@ -458,7 +459,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDate_printed(resultSet.getString("date_printed"));
+                pass.setDatePrinted(resultSet.getString("date_printed"));
+                pass.setDateCreated(resultSet.getString("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -1089,7 +1091,7 @@ public class SQLDatabase {
         ObservableList<Remark> remarks = FXCollections.observableArrayList();
         try {
 
-            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM remarks WHERE remarks_id='" + id + "'");
+            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM remarks WHERE remarks_id='" + id + "' ORDER BY created_at DESC");
             while (resultSet.next()) {
                 Remark remark = new Remark();
 
@@ -1148,6 +1150,13 @@ public class SQLDatabase {
         } catch (SQLException ex) {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private java.sql.Timestamp getCurrentTimeStamp() {
+
+        java.util.Date today = new java.util.Date();
+        return new java.sql.Timestamp(today.getTime());
+
     }
 
     private void showError(Exception ex) {

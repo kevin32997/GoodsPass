@@ -7,6 +7,7 @@ package printimage.controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -98,16 +99,19 @@ public class ViewBusinessInfoController implements Initializable {
     private ObservableList<Goodspass> passes;
     private ObservableList<Remark> remarks;
 
+    private SimpleDateFormat df;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        df = new SimpleDateFormat("MMMMM dd, yyyy - hh:mm:ss a");
         initTable();
     }
 
     private void initTable() {
         this.dialog_tablerow_id.setCellValueFactory(new PropertyValueFactory<Goodspass, String>("gpNo"));
         this.dialog_tablerow_name.setCellValueFactory(new PropertyValueFactory<Goodspass, String>("vehicleDesc"));
-        this.dialog_tablerow_printed.setCellValueFactory(new PropertyValueFactory<Goodspass, String>("date_printed"));
+        this.dialog_tablerow_printed.setCellValueFactory(new PropertyValueFactory<Goodspass, String>("datePrinted"));
         this.dialog_main_table.setRowFactory(tv -> {
             TableRow<Goodspass> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -156,8 +160,10 @@ public class ViewBusinessInfoController implements Initializable {
         remarks = db.getAllRemarkByRemarksId(businessInfo.getId());
 
         for (Goodspass driver : passes) {
-            if (driver.getDatePrinted() == null || driver.getDatePrinted().equals("")) {
+            if (driver.getSqlDatePrinted() == null) {
                 driver.setDatePrinted("Not Printed");
+            } else {
+                driver.setDatePrinted(df.format(driver.getSqlDatePrinted()));
             }
         }
         this.dialog_main_table.setItems(passes);

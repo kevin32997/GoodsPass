@@ -12,9 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -243,8 +240,8 @@ public class PrintPassesCtrl implements Initializable {
 
     @FXML
     void onPrintAll(ActionEvent event) {
-
         try {
+
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_printall_progress_layout.fxml"));
             AnchorPane progressDialog = fxmlLoader.load();
 
@@ -504,7 +501,6 @@ public class PrintPassesCtrl implements Initializable {
             if (!pass.getStatus().equals("1")) {
                 db.updatePassInfoPrinted(pass);
             }
-
         }).start();
     }
 

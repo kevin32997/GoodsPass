@@ -133,7 +133,7 @@ public class ViewPassDialogController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
 
-        df = new SimpleDateFormat("MMMMM dd,yyyy hh:mm:ss");
+        df = new SimpleDateFormat("MMMMM dd, yyyy - hh:mm:ss a");
         initFields();
     }
 
@@ -234,21 +234,18 @@ public class ViewPassDialogController implements Initializable {
     private void checkPassData() {
 
         if (info.getStatus().equals("" + MainActivityController.STATUS_PRINTED) || info.getStatus().equals("" + MainActivityController.STATUS_HOLD) && info.getSqlDatePrinted() != null) {
-
+            long MILLIS_PER_DAY = 24 * 60 * 60 * 1000L;
             java.util.Date dateToday = new java.util.Date();
-
             java.util.Date datePrinted = new java.util.Date(info.getSqlDatePrinted().getTime());
 
-            Calendar calPrinted = Calendar.getInstance();
-            Calendar calToday = Calendar.getInstance();
-
-            calPrinted.setTime(datePrinted);
-            calToday.setTime(dateToday);
-
-            boolean samedate = calPrinted.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
-                    && calPrinted.get(Calendar.YEAR) == calToday.get(Calendar.YEAR);
-
-            if (samedate) {
+            //Calendar calPrinted = Calendar.getInstance();
+            //Calendar calToday = Calendar.getInstance();
+            //calPrinted.setTime(datePrinted);
+            //calToday.setTime(dateToday);
+            // boolean samedate = calPrinted.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
+            //       && calPrinted.get(Calendar.YEAR) == calToday.get(Calendar.YEAR);
+            boolean moreThanDay = Math.abs(dateToday.getTime() - datePrinted.getTime()) > MILLIS_PER_DAY;
+            if (!moreThanDay) {
                 viewtype = ViewCrewDialogController.FORM_EDIT;
             } else {
                 btnEdit.setVisible(false);
@@ -257,9 +254,6 @@ public class ViewPassDialogController implements Initializable {
                 btnDelete.setVisible(false);
                 btnDelete.setDisable(true);
 
-                btnHold.setVisible(false);
-                btnHold.setDisable(true);
-
                 btnAdd.setVisible(false);
                 btnAdd.setDisable(true);
                 viewtype = ViewCrewDialogController.FORM_VIEW;
@@ -267,7 +261,7 @@ public class ViewPassDialogController implements Initializable {
 
             if (info.getStatus().equals("" + MainActivityController.STATUS_HOLD)) {
                 btnHold.setText("Approve");
-                dialog_date_printed.setText(this.df.format(info.getDatePrinted()) + " - CANCELLED");
+                dialog_date_printed.setText(this.df.format(info.getSqlDatePrinted()) + " - CANCELLED");
             } else {
                 btnHold.setText("Cancel");
 
@@ -358,6 +352,7 @@ public class ViewPassDialogController implements Initializable {
             db.updatePassInfoPrinted(info);
             db.updateDB();
         }
+
         this.checkPassData();
 
         // if this dialog came from business dialog
@@ -375,6 +370,7 @@ public class ViewPassDialogController implements Initializable {
             alert.setHeaderText("Goodspass has been canceled.");
             alert.showAndWait();
             db.updateDB();
+            this.refreshRemarksList();
         }
         this.checkPassData();
 
@@ -386,7 +382,7 @@ public class ViewPassDialogController implements Initializable {
 
     public void approvePass() {
 
-        if (info.getDatePrinted() != null) {
+        if (info.getSqlDatePrinted() != null) {
             info.setStatus("" + MainActivityController.STATUS_PRINTED);
             if (db.updatePassInfo(info)) {
                 Alert alert = new Alert(AlertType.INFORMATION);
@@ -394,6 +390,7 @@ public class ViewPassDialogController implements Initializable {
                 alert.setHeaderText("Goodspass has been approved.");
                 alert.showAndWait();
                 db.updateDB();
+                this.refreshRemarksList();
             }
         } else {
             info.setStatus("" + MainActivityController.STATUS_PENDING);
@@ -639,32 +636,37 @@ public class ViewPassDialogController implements Initializable {
 
         if (btnDelete.getText().equals("Delete")) {
             // Delete
+            if (info.getSqlDatePrinted() == null) {
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Delete");
+                alert.setHeaderText("Delete Data?");
+                alert.setContentText("Are you sure with this? this cannot be undone.");
 
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Delete");
-            alert.setHeaderText("Delete Data?");
-            alert.setContentText("Are you sure with this? this cannot be undone.");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    // ... user chose OK
+                    db.removePass(info.getId());
 
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                // ... user chose OK
-                db.removePass(info.getId());
+                    for (Crew crew : crews) {
+                        crew.setGpNo("");
+                        db.removeCrewInfo(crew.getId());
+                    }
+                    Alert alertSuccess = new Alert(AlertType.INFORMATION);
+                    alertSuccess.setTitle("Deleted");
+                    alertSuccess.setHeaderText("Data Successfully Deleted!");
+                    alertSuccess.showAndWait();
 
-                for (Crew crew : crews) {
-                    crew.setGpNo("");
-                    db.updateCrewInfo(crew);
+                    db.updateDB();
+                    stage.close();
+                } else {
+                    // ... user chose CANCEL or closed the dialog
                 }
-                Alert alertSuccess = new Alert(AlertType.INFORMATION);
-                alertSuccess.setTitle("Deleted");
-                alertSuccess.setHeaderText("Data Successfully Deleted!");
-                alertSuccess.showAndWait();
-
-                db.updateDB();
-                stage.close();
             } else {
-                // ... user chose CANCEL or closed the dialog
+                Alert alertSuccess = new Alert(AlertType.ERROR);
+                alertSuccess.setTitle("Operation Unable");
+                alertSuccess.setHeaderText("Cannot delete Pass Info!\nPass already been printed.");
+                alertSuccess.showAndWait();
             }
-
         } else {
             // Cancel
             this.btnDelete.setText("Delete");
@@ -678,33 +680,87 @@ public class ViewPassDialogController implements Initializable {
     @FXML
     void onHold(ActionEvent event) {
         if (btnHold.getText().equals("Cancel")) {
-            // Cancel
+            try {
+                // Cancel
 
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Cancel Pass");
-            alert.setHeaderText("Cancel this Goodspass?");
-            alert.setContentText("Are you sure with this?");
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+                Parent parent = fxmlLoader.load();
+                Stage stage = new Stage();
+                Scene scene = new Scene(parent, 470, 370);
 
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                cancelPass();
-            } else {
-                // ... user chose CANCEL or closed the dialog
+                stage.setTitle("Add Remarks");
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
+
+                TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+                Button btnSave = (Button) parent.lookup("#btnSave");
+                Button btnCancel = (Button) parent.lookup("#btnCancel");
+
+                btnSave.setOnAction(e -> {
+
+                    if (descriptionText.getText().equals("")) {
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Please add description to save!");
+                        alert.showAndWait();
+                    } else {
+                        if (db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText())) {
+                            cancelPass();
+                            stage.close();
+                        }
+                    }
+                });
+
+                btnCancel.setOnAction(e -> {
+                    stage.close();
+                });
+
+                stage.show();
+            } catch (IOException ex) {
+                Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         } else {
-            // Approve
+            try {
+                // Approve
 
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Approve Pass");
-            alert.setHeaderText("Approve this Goodspass?");
-            alert.setContentText("Are you sure with this?");
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+                Parent parent = fxmlLoader.load();
+                Stage stage = new Stage();
+                Scene scene = new Scene(parent, 470, 370);
 
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                approvePass();
+                stage.setTitle("Add Remarks");
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
 
-            } else {
-                // ... user chose CANCEL or closed the dialog
+                TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+                Button btnSave = (Button) parent.lookup("#btnSave");
+                Button btnCancel = (Button) parent.lookup("#btnCancel");
+
+                btnSave.setOnAction(e -> {
+
+                    if (descriptionText.getText().equals("")) {
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Please add description to save!");
+                        alert.showAndWait();
+                    } else {
+                        if (db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText())) {
+                            approvePass();
+                            stage.close();
+                        }
+                    }
+                });
+
+                btnCancel.setOnAction(e -> {
+                    stage.close();
+                });
+
+                stage.show();
+            } catch (IOException ex) {
+                Logger.getLogger(ViewPassDialogController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

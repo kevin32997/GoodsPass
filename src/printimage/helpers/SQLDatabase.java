@@ -119,7 +119,8 @@ public class SQLDatabase {
                     + "vehicle_desc = ?, "
                     + "vehicle_plate_no = ?, "
                     + "business_id = ?, "
-                    + "status = ? ";
+                    + "status = ? "
+                    + "WHERE id = ?";
 
             PreparedStatement ps = con.prepareStatement(query);
 
@@ -128,6 +129,7 @@ public class SQLDatabase {
             ps.setString(3, info.getVehiclePlateNo());
             ps.setString(4, info.getBusinessId());
             ps.setInt(5, Integer.parseInt(info.getStatus()));
+            ps.setInt(6, info.getId());
 
             ps.executeUpdate();
 
@@ -262,8 +264,8 @@ public class SQLDatabase {
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setBusinessName(resultSet.getString("business_name"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDatePrinted(resultSet.getString("date_printed"));
-                pass.setDateCreated(resultSet.getString("created_at"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -386,8 +388,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDatePrinted(resultSet.getString("date_printed"));
-                pass.setDateCreated(resultSet.getString("created_at"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 drivers.add(pass);
             }
 
@@ -435,8 +437,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDatePrinted(resultSet.getString("date_printed"));
-                pass.setDateCreated(resultSet.getString("created_at"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {
@@ -459,8 +461,8 @@ public class SQLDatabase {
                 pass.setVehiclePlateNo(resultSet.getString("vehicle_plate_no"));
                 pass.setBusinessId(resultSet.getString("business_id"));
                 pass.setStatus(resultSet.getString("status"));
-                pass.setDatePrinted(resultSet.getString("date_printed"));
-                pass.setDateCreated(resultSet.getString("created_at"));
+                pass.setSqlDatePrinted(resultSet.getTimestamp("date_printed"));
+                pass.setSqlDateCreated(resultSet.getTimestamp("created_at"));
                 passes.add(pass);
             }
         } catch (SQLException ex) {

@@ -25,6 +25,7 @@ import printimage.models.BusinessInfo;
 import printimage.models.Crew;
 import printimage.models.Goodspass;
 import printimage.models.Remark;
+import printimage.models.User;
 
 public class SQLDatabase {
 
@@ -302,11 +303,16 @@ public class SQLDatabase {
 
     }
 
-    public ObservableList<Goodspass> searchPassInfoByGivenColumnLimit(String searchby, String start, int limit) {
+    public ObservableList<Goodspass> searchPassInfoByGivenColumnLimit(String column, String text, int limit) {
         ObservableList<Goodspass> passes = FXCollections.observableArrayList();
         try {
+            String query = "SELECT * FROM passes WHERE " + column + " LIKE ? limit " + limit;
 
-            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM passes WHERE " + searchby + " LIKE '%" + start + "%' limit " + limit);
+            PreparedStatement ps = this.con.prepareStatement(query);
+
+            ps.setString(1, "%" + text + "%");
+
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 Goodspass pass = new Goodspass();
                 pass.setId(resultSet.getInt("id"));
@@ -762,7 +768,14 @@ public class SQLDatabase {
     public ObservableList<BusinessInfo> searchBusinessInfoLimit(String text, int limit) {
         ObservableList<BusinessInfo> businesses = FXCollections.observableArrayList();
         try {
-            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM business_info WHERE business_name LIKE '%" + text + "%' limit " + limit);
+            String query = "SELECT * FROM business_info WHERE business_name LIKE ? limit " + limit;
+
+            PreparedStatement ps = this.con.prepareStatement(query);
+            ps.setString(1, "%" + text + "%");
+
+            System.out.println("Query: " + ps);
+
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 BusinessInfo info = new BusinessInfo();
                 info.setId(resultSet.getInt("id"));
@@ -784,7 +797,14 @@ public class SQLDatabase {
     public ObservableList<BusinessInfo> searchBusinessInfoByColumnLimit(String column, String text, int limit) {
         ObservableList<BusinessInfo> businesses = FXCollections.observableArrayList();
         try {
-            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM business_info WHERE " + column + " LIKE '%" + text + "%' limit " + limit);
+            String query = "SELECT * FROM business_info WHERE " + column + " LIKE ? limit " + limit;
+
+            PreparedStatement ps = this.con.prepareStatement(query);
+            ps.setString(1, "%" + text + "%");
+
+            System.out.println("Query: " + ps);
+
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 BusinessInfo info = new BusinessInfo();
                 info.setId(resultSet.getInt("id"));
@@ -964,7 +984,12 @@ public class SQLDatabase {
     public ObservableList<Crew> searchCrewInfoByColumnLimit(String column, String text, int limit) {
         ObservableList<Crew> crews = FXCollections.observableArrayList();
         try {
-            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM crew_info WHERE " + column + " LIKE '%" + text + "%' limit " + limit);
+            String sql = "SELECT * FROM crew_info WHERE " + column + " LIKE ? limit " + limit;
+
+            PreparedStatement ps = this.con.prepareStatement(sql);
+
+            ps.setString(1, "%" + text + "%");
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 Crew crew = new Crew();
                 crew.setId(resultSet.getInt("id"));
@@ -1112,6 +1137,149 @@ public class SQLDatabase {
 
         }
         return remarks;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                  REMARKS INFO CRUD 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public boolean createUser(User user) {
+        int return_value = 0;
+        try {
+            String query = "INSERT into users ("
+                    + "username, "
+                    + "user_type, "
+                    + "password "
+                    + "fullname) VALUES ("
+                    + "?,"
+                    + "?, "
+                    + "?, "
+                    + "?)";
+
+            // create the mysql insert preparedstatement
+            PreparedStatement preparedStmt = con.prepareStatement(query, new String[]{"id"});
+            preparedStmt.setString(1, user.getUsername());
+            preparedStmt.setInt(2, user.getUsertype());
+            preparedStmt.setString(3, user.getPassword());
+            preparedStmt.setString(3, user.getFullname());
+
+            return_value = preparedStmt.executeUpdate();
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.FINE, null, "Fullname Information ADDED!");
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        return return_value > 0;
+    }
+
+    public User checkUser(String username, String password) {
+        User user = null;
+        try {
+
+            String query = "SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1";
+
+            PreparedStatement ps = this.con.prepareStatement(query, new String[]{"id"});
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setUsertype(rs.getInt("user_type"));
+                user.setPassword(rs.getString("password"));
+                user.setDateCreated(rs.getTimestamp("created_at"));
+                user.setDateUpdated(rs.getTimestamp("updated_at"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return user;
+    }
+
+    // Update
+    public boolean updateUser(User user) {
+        try {
+            String query = "UPDATE users SET "
+                    + "username=?, "
+                    + "user_type=?, "
+                    + "password=?, "
+                    + "fullname=?, "
+                    + "updated_at=? "
+                    + "WHERE id=?";
+
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, user.getUsername());
+            ps.setInt(2, user.getUsertype());
+            ps.setString(3, user.getPassword());
+            ps.setString(4, user.getFullname());
+            ps.setTimestamp(5, this.getCurrentTimeStamp());
+            ps.setInt(6, user.getId());
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+            return false;
+        }
+        return true;
+    }
+
+    // View LIMIT
+    public ObservableList<User> getUserLimitAsc(int offset, int count, String order) {
+        ObservableList<User> users = FXCollections.observableArrayList();
+        try {
+
+            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM users ORDER BY " + order + " LIMIT " + offset + "," + count);
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setUsertype(resultSet.getInt("user_type"));
+                user.setPassword(resultSet.getString("password"));
+
+                user.setDateCreated(resultSet.getTimestamp("created_at"));
+                user.setDateUpdated(resultSet.getTimestamp("updated_at"));
+                users.add(user);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        return users;
+    }
+
+    // VIEW BY DB COLUMN
+    public ObservableList<User> searchUserInfoByColumnLimit(String column, String text, int limit) {
+        ObservableList<User> users = FXCollections.observableArrayList();
+        try {
+            String query = "SELECT * FROM users WHERE ? LIKE ? LIMIT ?";
+
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, column);
+            ps.setString(2, "%" + text + "%");
+            ps.setInt(3, limit);
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setUsertype(resultSet.getInt("user_type"));
+                user.setPassword(resultSet.getString("password"));
+
+                user.setDateCreated(resultSet.getTimestamp("created_at"));
+                user.setDateUpdated(resultSet.getTimestamp("updated_at"));
+                users.add(user);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        return users;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

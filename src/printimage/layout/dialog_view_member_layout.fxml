@@ -24,7 +24,7 @@
       <Button fx:id="btnPreview" layoutX="31.0" layoutY="356.0" mnemonicParsing="false" onAction="#onPreview" prefHeight="25.0" prefWidth="186.0" text="Preview Pass Layout" />
       <Button fx:id="btnClose" layoutX="756.0" layoutY="356.0" mnemonicParsing="false" onAction="#onClose" prefHeight="25.0" prefWidth="93.0" text="Close" />
       <Button fx:id="btnEdit" layoutX="332.0" layoutY="305.0" mnemonicParsing="false" onAction="#onEdit" prefHeight="25.0" prefWidth="87.0" text="Edit" />
-      <Button fx:id="btnHold" layoutX="31.0" layoutY="305.0" mnemonicParsing="false" onAction="#onHold" prefHeight="25.0" prefWidth="120.0" text="Cancel" />
+      <Button fx:id="btnHold" layoutX="31.0" layoutY="305.0" mnemonicParsing="false" onAction="#onHold" prefHeight="25.0" prefWidth="120.0" text="Cancel Pass" />
       <Button fx:id="btnDelete" layoutX="232.0" layoutY="305.0" mnemonicParsing="false" onAction="#onDelete" prefHeight="25.0" prefWidth="87.0" text="Delete" />
       <Label layoutX="28.0" layoutY="271.0" text="Date Printed" />
       <TextField fx:id="dialog_date_printed" editable="false" layoutX="111.0" layoutY="266.0" prefHeight="27.0" prefWidth="308.0" />

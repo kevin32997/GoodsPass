@@ -7,10 +7,7 @@ package printimage.controller;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Date;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -263,7 +260,7 @@ public class ViewPassDialogController implements Initializable {
                 btnHold.setText("Approve");
                 dialog_date_printed.setText(this.df.format(info.getSqlDatePrinted()) + " - CANCELLED");
             } else {
-                btnHold.setText("Cancel");
+                btnHold.setText("Cancel Pass");
 
                 dialog_date_printed.setText(this.df.format(info.getSqlDatePrinted()));
             }
@@ -281,7 +278,7 @@ public class ViewPassDialogController implements Initializable {
             }
 
         } else {
-            btnHold.setText("Cancel");
+            btnHold.setText("Cancel Pass");
             viewtype = ViewCrewDialogController.FORM_EDIT;
             dialog_date_printed.setText("NOT PRINTED.");
         }
@@ -679,7 +676,7 @@ public class ViewPassDialogController implements Initializable {
 
     @FXML
     void onHold(ActionEvent event) {
-        if (btnHold.getText().equals("Cancel")) {
+        if (btnHold.getText().equals("Cancel Pass")) {
             try {
                 // Cancel
 

@@ -20,12 +20,14 @@ public class User {
     private String username;
     private String password;
     private int usertype;
+    private String text_usertype;
     private String fullname;
 
     private Timestamp dateCreated;
     private Timestamp dateUpdated;
 
     public User() {
+        
     }
 
     public int getId() {
@@ -83,6 +85,16 @@ public class User {
     public void setDateUpdated(Timestamp dateUpdated) {
         this.dateUpdated = dateUpdated;
     }
+
+    public String getText_usertype() {
+        return text_usertype;
+    }
+
+    public void setText_usertype(String text_usertype) {
+        this.text_usertype = text_usertype;
+    }
+    
+    
 
     @Override
     public String toString() {

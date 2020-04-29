@@ -229,6 +229,48 @@
                      </children></AnchorPane>
               </content>
             </Tab>
+            <Tab text="ADMINISTRATOR [F6]">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="users_maintable" layoutX="14.0" layoutY="96.0" prefHeight="662.0" prefWidth="723.0" AnchorPane.bottomAnchor="69.0" AnchorPane.leftAnchor="445.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="96.0">
+                           <columns>
+                              <TableColumn fx:id="users_tablecolumn_id" prefWidth="99.0" text="ID" />
+                              <TableColumn fx:id="users_tablecolumn_fullname" prefWidth="347.0" text="FULLNAME" />
+                              <TableColumn fx:id="users_tablecolumn_username" prefWidth="75.0" text="USERNAME" />
+                              <TableColumn fx:id="users_tablecolumn_usertype" prefWidth="75.0" text="USER TYPE" />
+                           </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                        <TextField fx:id="usersInfo_search" layoutX="14.0" layoutY="64.0" prefHeight="25.0" prefWidth="300.0" promptText="Search . . ." AnchorPane.leftAnchor="446.0" AnchorPane.topAnchor="64.0" />
+                        <Label layoutX="53.0" layoutY="102.0" prefHeight="18.0" prefWidth="61.0" text="Fullname" AnchorPane.topAnchor="102.0" />
+                        <TextField fx:id="users_fullname" layoutX="118.0" layoutY="98.0" prefHeight="22.0" prefWidth="311.0" AnchorPane.topAnchor="98.0" />
+                        <Label layoutX="47.0" layoutY="142.0" prefHeight="17.0" prefWidth="61.0" text="Username" AnchorPane.topAnchor="142.0" />
+                        <TextField fx:id="users_username" layoutX="118.0" layoutY="138.0" prefHeight="22.0" prefWidth="311.0" AnchorPane.topAnchor="138.0" />
+                        <Label layoutX="52.0" layoutY="182.0" prefHeight="18.0" prefWidth="56.0" text="User type" AnchorPane.topAnchor="182.0" />
+                        <Label layoutX="49.0" layoutY="221.0" prefHeight="18.0" prefWidth="57.0" text="Password" AnchorPane.topAnchor="221.0" />
+                        <TextField fx:id="users_password" layoutX="118.0" layoutY="217.0" prefHeight="22.0" prefWidth="311.0" AnchorPane.topAnchor="217.0" />
+                        <Label layoutX="28.0" layoutY="259.0" prefHeight="18.0" prefWidth="74.0" text="Confirm Pass" AnchorPane.topAnchor="259.0" />
+                        <TextField fx:id="users_confirmpass" layoutX="118.0" layoutY="255.0" prefHeight="22.0" prefWidth="311.0" AnchorPane.topAnchor="255.0" />
+                        <Button layoutX="172.0" layoutY="308.0" mnemonicParsing="false" onAction="#onSaveUserInfo" prefHeight="32.0" prefWidth="115.0" text="CREATE" AnchorPane.topAnchor="308.0" />
+                        <Pagination fx:id="usersInfo_pagination" layoutX="446.0" layoutY="761.0" prefHeight="43.0" prefWidth="753.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="446.0" AnchorPane.rightAnchor="15.0" />
+                        <Label layoutX="334.0" layoutY="68.0" text="Search by" AnchorPane.leftAnchor="769.0" AnchorPane.topAnchor="68.0" />
+                        <ChoiceBox fx:id="usersInfo_seachby" layoutX="392.0" layoutY="64.0" prefWidth="150.0" AnchorPane.leftAnchor="824.0" AnchorPane.topAnchor="64.0" />
+                        <Label layoutX="24.0" layoutY="64.0" text="Create User">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Button layoutX="645.0" layoutY="64.0" mnemonicParsing="false" onAction="#onSortypeAscending" prefHeight="25.0" prefWidth="50.0" text="ASC" AnchorPane.leftAnchor="1062.0" AnchorPane.topAnchor="64.0" />
+                        <Button layoutX="707.0" layoutY="64.0" mnemonicParsing="false" onAction="#onSortypeDescending" prefHeight="25.0" prefWidth="50.0" text="DESC" AnchorPane.leftAnchor="1117.0" AnchorPane.topAnchor="64.0" />
+                        <Label layoutX="595.0" layoutY="68.0" text="Sortype" AnchorPane.leftAnchor="1010.0" AnchorPane.topAnchor="68.0" />
+                        <ChoiceBox fx:id="users_usertype" layoutX="118.0" layoutY="179.0" prefHeight="25.0" prefWidth="311.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

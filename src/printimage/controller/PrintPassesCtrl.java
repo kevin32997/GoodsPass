@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,10 +29,12 @@ import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -50,6 +51,7 @@ import printimage.helpers.Helper;
 import printimage.helpers.SQLDatabase;
 import printimage.models.Crew;
 import printimage.models.Goodspass;
+import printimage.models.Remark;
 
 /**
  * FXML Controller class
@@ -82,6 +84,8 @@ public class PrintPassesCtrl implements Initializable {
     @FXML
     private ProgressIndicator progress;
 
+    private boolean isReprinted = false;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
@@ -98,6 +102,19 @@ public class PrintPassesCtrl implements Initializable {
         setupListData();
         // Setups Pages to be printed
         setupPageToPrint();
+
+        // Check if already printed
+        checkReprinted();
+    }
+
+    private void checkReprinted() {
+        new Thread(() -> {
+            for (Goodspass pass : listToPrint) {
+                if (pass.getStatus().equals("1")) {
+                    isReprinted = true;
+                }
+            }
+        }).start();
     }
 
     private void setupListData() {
@@ -116,63 +133,6 @@ public class PrintPassesCtrl implements Initializable {
             } catch (IOException ex) {
                 Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-    }
-
-    private void printPass(Goodspass pass, ProgressIndicator progress) {
-        new Thread(() -> {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/layout_to_print_auto.fxml"));
-                AnchorPane toPrint = fxmlLoader.load();
-                Text control_number = (Text) toPrint.lookup("#control_no");
-
-                Text business_name = (Text) toPrint.lookup("#business_name");
-                Text business_address = (Text) toPrint.lookup("#business_address");
-                Text plate_no = (Text) toPrint.lookup("#plate_no");
-                Text description = (Text) toPrint.lookup("#description");
-
-                Text designation1 = (Text) toPrint.lookup("#designation1");
-                Text designation2 = (Text) toPrint.lookup("#designation2");
-
-                control_number.setText(pass.getGpNo());
-
-                business_name.setText(pass.getBusinessName());
-                autoResizeField(business_name);
-
-                business_address.setText(pass.getBusinessAddress());
-                autoResizeField(business_address);
-
-                plate_no.setText(pass.getVehiclePlateNo());
-                autoResizeField(plate_no);
-
-                description.setText(pass.getVehicleDesc());
-                autoResizeField(description);
-
-                Platform.runLater(() -> {
-                    save(toPrint, pass.getGpNo(), progress);
-                });
-            } catch (IOException ex) {
-                Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }).start();
-
-    }
-
-    private void save(AnchorPane pane, String title, ProgressIndicator progress) {
-        WritableImage img = pixelScaleAwareCanvasSnapshot(pane, 3);
-        // File fileToSave = chooser.getSelectedFile();//Remove this line.
-
-        // BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
-        try {
-            File fileToSave = new File(MainActivityController.settings.getFolderPath(), title + ".png");
-            ImageIO.write(SwingFXUtils.fromFXImage(img, null), "png", fileToSave);
-            progress.setVisible(false);
-            // this.stage.close();
-        } catch (IOException ex) {
-            Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-
-        } catch (NullPointerException ex) {
-            Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -241,39 +201,99 @@ public class PrintPassesCtrl implements Initializable {
     @FXML
     void onPrintAll(ActionEvent event) {
         try {
-
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_printall_progress_layout.fxml"));
             AnchorPane progressDialog = fxmlLoader.load();
 
-            Stage stage = new Stage();
-            stage.setTitle("PRINTING");
-            stage.setResizable(false);
+            Stage printDialogStage = new Stage();
+            printDialogStage.setTitle("PRINTING");
+            printDialogStage.setResizable(false);
             Scene scene = new Scene(progressDialog, 325, 146);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-
+            printDialogStage.initModality(Modality.APPLICATION_MODAL);
+            printDialogStage.setScene(scene);
             Label pageCount = (Label) progressDialog.lookup("#page_count");
-
             pageCount.setText("Page count " + paneToPrint.size());
 
-            stage.show();
+            if (isReprinted) {
+                FXMLLoader remarksLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_add_remarks_layout.fxml"));
+                Parent parent = remarksLoader.load();
+                Stage remarksStage = new Stage();
+                Scene remarksScene = new Scene(parent, 470, 370);
 
-            PrinterJob printJob = this.print(paneToPrint, stage);
+                remarksStage.setTitle("Add Remarks");
+                remarksStage.setScene(remarksScene);
+                remarksStage.initModality(Modality.APPLICATION_MODAL);
+                remarksStage.setResizable(false);
 
-            Button btnCancel = (Button) progressDialog.lookup("#btnCancel");
+                TextArea descriptionText = (TextArea) parent.lookup("#text_area");
+                Button btnSave = (Button) parent.lookup("#btnSave");
+                Button btnCancel = (Button) parent.lookup("#btnCancel");
 
-            btnCancel.setOnAction(e -> {
-                if (printJob != null) {
-                    printJob.cancelJob();
-                    printJob.endJob();
-                    stage.close();
-                }
-            });
+                btnSave.setOnAction(e -> {
+
+                    if (descriptionText.getText().equals("")) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Please add description to save!");
+                        alert.showAndWait();
+                    } else {
+
+                        PrinterJob printJob = this.print(paneToPrint, printDialogStage);
+
+                        Button dialogBtnCancel = (Button) progressDialog.lookup("#btnCancel");
+
+                        dialogBtnCancel.setOnAction(ev -> {
+                            if (printJob != null) {
+                                printJob.cancelJob();
+                                printJob.endJob();
+                                printDialogStage.close();
+                            }
+                        });
+
+                        printDialogStage.show();
+
+                        addReprintRemarks(descriptionText.getText());
+                        remarksStage.close();
+
+                    }
+                });
+
+                btnCancel.setOnAction(e -> {
+                    remarksStage.close();
+                });
+
+                remarksStage.show();
+
+            } else {
+
+                PrinterJob printJob = this.print(paneToPrint, printDialogStage);
+
+                Button btnCancel = (Button) progressDialog.lookup("#btnCancel");
+
+                btnCancel.setOnAction(e -> {
+                    if (printJob != null) {
+                        printJob.cancelJob();
+                        printJob.endJob();
+                        printDialogStage.close();
+                    }
+                });
+                printDialogStage.show();
+            }
 
             // Fetch progress layout
         } catch (IOException ex) {
             Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void addReprintRemarks(String description) {
+        new Thread(() -> {
+            for (Goodspass pass : listToPrint) {
+                if (pass.getStatus().equals("1")) {
+                    db.createRemarks(Remark.REMARK_PASS, pass.getId(), description);
+                }
+            }
+            System.out.println("Remarks added!");
+        }).start();
     }
 
     // Builds Passes Images to be printed
@@ -394,108 +414,6 @@ public class PrintPassesCtrl implements Initializable {
         });
     }
 
-    /*
-    
-    private void printToFiles(Stage progressStage, AnchorPane dialogPane) {
-        final int printed_count[] = {0};
-        final int error_count[] = {0};
-
-        int max_count = this.listToPrint.size();
-        final int printed[] = {0};
-        ProgressBar progress = (ProgressBar) dialogPane.lookup("#progress");
-        Label progressCount = (Label) dialogPane.lookup("#print_count");
-        progressCount.setText(printed[0] + "/" + max_count);
-        new Thread(() -> {
-            for (Goodspass pass : listToPrint) {
-                ObservableList<Crew> crews = db.getAllCrewByGPNo(pass.getGpNo());
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/layout_to_print_auto.fxml"));
-                    AnchorPane toPrint = fxmlLoader.load();
-                    Text control_number = (Text) toPrint.lookup("#control_no");
-
-                    Text business_name = (Text) toPrint.lookup("#business_name");
-                    Text business_address = (Text) toPrint.lookup("#business_address");
-                    Text plate_no = (Text) toPrint.lookup("#plate_no");
-                    Text description = (Text) toPrint.lookup("#description");
-
-                    ImageView image = (ImageView) toPrint.lookup("#main_image");
-
-                    control_number.setText(pass.getGpNo());
-
-                    business_name.setText(pass.getBusinessName());
-                    autoResizeField(business_name);
-
-                    business_address.setText(pass.getBusinessAddress());
-                    autoResizeField(business_address);
-
-                    plate_no.setText(pass.getVehiclePlateNo());
-                    autoResizeField(plate_no);
-
-                    description.setText(pass.getVehicleDesc());
-                    autoResizeField(description);
-
-                    Text designation1 = (Text) toPrint.lookup("#designation1");
-                    Text designation2 = (Text) toPrint.lookup("#designation2");
-
-                    if (crews.size() > 0) {
-                        designation1.setText(crews.get(0).getFullname() + " - " + crews.get(0).getDesignation());
-                        if (crews.size() > 1) {
-                            designation2.setText(crews.get(1).getFullname() + " - " + crews.get(1).getDesignation());
-                        } else {
-                            designation2.setText("NONE");
-                        }
-                    }
-
-                    autoResizeField(designation1);
-                    autoResizeField(designation2);
-
-                    Platform.runLater(() -> {
-                        try {
-                            image.setImage(createQrCode(pass.getGpNo()));
-                            WritableImage img = pixelScaleAwareCanvasSnapshot(toPrint, 3);
-                            // File fileToSave = chooser.getSelectedFile();//Remove this line.
-
-                            // BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
-                            File fileToSave = new File(MainActivityController.settings.getFolderPath(), pass.getGpNo() + ".png");
-                            ImageIO.write(SwingFXUtils.fromFXImage(img, null), "png", fileToSave);
-                            updatePassInfo(pass);
-                            printed[0]++;
-                            printed_count[0]++;
-                            progressCount.setText(printed[0] + "/" + max_count);
-                            // this.stage.close();
-                        } catch (IOException ex) {
-                            Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-                            error_count[0]++;
-                        } catch (NullPointerException ex) {
-                            Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-                            error_count[0]++;
-                        }
-                    });
-
-                    Thread.sleep(250);
-
-                } catch (IOException ex) {
-                    Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-            // End
-            Platform.runLater(() -> {
-                progressStage.close();
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Success");
-                alert.setHeaderText("Passes Printed!");
-                alert.setContentText("Success: " + printed_count[0] + " - Unsuccessfull: " + error_count[0]);
-
-                alert.showAndWait();
-                db.updateDB();
-            });
-
-        }).start();
-    }
-     */
     private void updatePassInfo(Goodspass pass) {
         new Thread(() -> {
             if (!pass.getStatus().equals("1")) {

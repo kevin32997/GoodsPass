@@ -1142,17 +1142,37 @@ public class SQLDatabase {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                  REMARKS INFO CRUD 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Count
+    public int getUsersCount() {
+        int count = 0;
+        String query = "SELECT count(*) FROM users";
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet resultSet = stmt.executeQuery(query);
+            while (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        return count;
+    }
+
     public boolean createUser(User user) {
         int return_value = 0;
         try {
             String query = "INSERT into users ("
                     + "username, "
                     + "user_type, "
-                    + "password "
-                    + "fullname) VALUES ("
+                    + "password, "
+                    + "full_name,"
+                    + "active) "
+                    + "VALUES ("
                     + "?,"
-                    + "?, "
-                    + "?, "
+                    + "?,"
+                    + "?,"
+                    + "?,"
                     + "?)";
 
             // create the mysql insert preparedstatement
@@ -1160,7 +1180,8 @@ public class SQLDatabase {
             preparedStmt.setString(1, user.getUsername());
             preparedStmt.setInt(2, user.getUsertype());
             preparedStmt.setString(3, user.getPassword());
-            preparedStmt.setString(3, user.getFullname());
+            preparedStmt.setString(4, user.getFullname());
+            preparedStmt.setInt(5, 1);
 
             return_value = preparedStmt.executeUpdate();
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.FINE, null, "Fullname Information ADDED!");
@@ -1185,7 +1206,34 @@ public class SQLDatabase {
             while (rs.next()) {
                 user = new User();
                 user.setId(rs.getInt("id"));
+                user.setFullname(rs.getString("full_name"));
                 user.setUsername(rs.getString("username"));
+                user.setUsertype(rs.getInt("user_type"));
+                user.setPassword(rs.getString("password"));
+                user.setDateCreated(rs.getTimestamp("created_at"));
+                user.setDateUpdated(rs.getTimestamp("updated_at"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return user;
+    }
+
+    public User checkUsersUsername(String username) {
+        User user = null;
+        try {
+
+            String query = "SELECT * FROM users WHERE username = ? LIMIT 1";
+
+            PreparedStatement ps = this.con.prepareStatement(query, new String[]{"id"});
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                user = new User();
+                user.setId(rs.getInt("id"));
+                user.setFullname(rs.getString("full_name"));
+                user.setUsername(rs.getString("username"));
+
                 user.setUsertype(rs.getInt("user_type"));
                 user.setPassword(rs.getString("password"));
                 user.setDateCreated(rs.getTimestamp("created_at"));
@@ -1204,7 +1252,7 @@ public class SQLDatabase {
                     + "username=?, "
                     + "user_type=?, "
                     + "password=?, "
-                    + "fullname=?, "
+                    + "full_name=?, "
                     + "updated_at=? "
                     + "WHERE id=?";
 
@@ -1227,7 +1275,7 @@ public class SQLDatabase {
     }
 
     // View LIMIT
-    public ObservableList<User> getUserLimitAsc(int offset, int count, String order) {
+    public ObservableList<User> getUserLimitOrder(int offset, int count, String order) {
         ObservableList<User> users = FXCollections.observableArrayList();
         try {
 
@@ -1235,6 +1283,7 @@ public class SQLDatabase {
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt("id"));
+                user.setFullname(resultSet.getString("full_name"));
                 user.setUsername(resultSet.getString("username"));
                 user.setUsertype(resultSet.getInt("user_type"));
                 user.setPassword(resultSet.getString("password"));
@@ -1266,6 +1315,7 @@ public class SQLDatabase {
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt("id"));
+                user.setFullname(resultSet.getString("full_name"));
                 user.setUsername(resultSet.getString("username"));
                 user.setUsertype(resultSet.getInt("user_type"));
                 user.setPassword(resultSet.getString("password"));

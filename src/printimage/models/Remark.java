@@ -19,6 +19,8 @@ public class Remark {
     private int id;
     private int type;
     private int remarkId;
+    private int user_id;
+
     private String description;
     private String dateCreated;
 
@@ -65,4 +67,13 @@ public class Remark {
     public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
+
 }

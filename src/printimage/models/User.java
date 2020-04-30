@@ -23,11 +23,14 @@ public class User {
     private String text_usertype;
     private String fullname;
 
+    private int active;
+    private String isActive;
+
     private Timestamp dateCreated;
     private Timestamp dateUpdated;
 
     public User() {
-        
+
     }
 
     public int getId() {
@@ -93,14 +96,29 @@ public class User {
     public void setText_usertype(String text_usertype) {
         this.text_usertype = text_usertype;
     }
-    
-    
 
+    public int getActive() {
+        return active;
+    }
+
+    public void setActive(int active) {
+        this.active = active;
+    }
+
+    public String getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(String isActive) {
+        this.isActive = isActive;
+    }
+    
+    
+    
+   
     @Override
     public String toString() {
         return "User{" + "id=" + id + ", username=" + username + ", password=" + password + ", usertype=" + usertype + ", fullname=" + fullname + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + '}';
     }
 
-
- 
 }

@@ -42,6 +42,7 @@ import printimage.models.Crew;
 import printimage.models.Goodspass;
 import printimage.models.Passes;
 import printimage.models.Remark;
+import printimage.models.User;
 
 /**
  * FXML Controller class
@@ -494,11 +495,20 @@ public class ViewPassDialogController implements Initializable {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
 
+            Label createdBy = (Label) parent.lookup("#created_by");
+
             Label remarksOf = (Label) parent.lookup("#remarks_of");
             Label dateCreated = (Label) parent.lookup("#date_created");
             TextArea textArea = (TextArea) parent.lookup("#text_area");
             Button btnClose = (Button) parent.lookup("#btnClose");
 
+            User user = db.getUserById(remark.getUser_id());
+
+            if (user != null) {
+                createdBy.setText("Remarks by: " + user.getFullname());
+            } else {
+                createdBy.setText("Remarks by: Unknown");
+            }
             remarksOf.setText("Remarks of: " + info.getGpNo());
             dateCreated.setText("Date Create: " + remark.getDateCreated());
             textArea.setText(remark.getDescription());
@@ -569,9 +579,9 @@ public class ViewPassDialogController implements Initializable {
                     if (db.updatePassInfo(info)) {
 
                         if (descriptionText.getText().equals("")) {
-                            db.createRemarks(Remark.REMARK_PASS, this.info.getId(), "PASS INFORMATION UPDATED");
+                            db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), "PASS INFORMATION UPDATED");
                         } else {
-                            db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText());
+                            db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText());
                         }
                         db.updateDB();
                         Alert alert = new Alert(AlertType.INFORMATION);
@@ -702,7 +712,7 @@ public class ViewPassDialogController implements Initializable {
                         alert.setHeaderText("Please add description to save!");
                         alert.showAndWait();
                     } else {
-                        if (db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText())) {
+                        if (db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
                             cancelPass();
                             stage.close();
                         }
@@ -744,7 +754,7 @@ public class ViewPassDialogController implements Initializable {
                         alert.setHeaderText("Please add description to save!");
                         alert.showAndWait();
                     } else {
-                        if (db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText())) {
+                        if (db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
                             approvePass();
                             stage.close();
                         }
@@ -815,7 +825,7 @@ public class ViewPassDialogController implements Initializable {
                     alert.setHeaderText("Please add description to save!");
                     alert.showAndWait();
                 } else {
-                    if (db.createRemarks(Remark.REMARK_PASS, this.info.getId(), descriptionText.getText())) {
+                    if (db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
                         db.updateDB();
                         Alert alert = new Alert(AlertType.INFORMATION);
                         alert.setTitle("Updated");

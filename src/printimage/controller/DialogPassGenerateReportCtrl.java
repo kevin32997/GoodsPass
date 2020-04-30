@@ -125,25 +125,24 @@ public class DialogPassGenerateReportCtrl implements Initializable {
         this.progress.setVisible(true);
         new Thread(() -> {
             ZoneId defaultZoneId = ZoneId.systemDefault();
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat df = new SimpleDateFormat("MMMMM dd, yyyy - hh:mm:ss a");
 
             ObservableList<Goodspass> passes = FXCollections.observableArrayList();
 
             if (search_type == 0) {
-  
+
                 LocalDate dateFrom = date_from.getValue();
                 LocalDate dateUntil = date_until.getValue().plusDays(1);
                 String text_date_from = df.format(Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant()));
                 String text_date_until = df.format(Date.from(dateUntil.atStartOfDay(defaultZoneId).toInstant()));
                 passes = db.getPassByDate(text_date_from, text_date_until, this.sortType);
             } else if (search_type == 1) {
-     
+
                 LocalDate dateFrom = date_from.getValue();
                 String text_date_from = df.format(Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant()));
                 passes = db.getPassByDateOperation(text_date_from, ">=", this.sortType);
             } else if (search_type == 2) {
 
-   
                 LocalDate dateUntil = date_until.getValue();
                 String text_date_until = df.format(Date.from(dateUntil.atStartOfDay(defaultZoneId).toInstant()));
                 passes = db.getPassByDateOperation(text_date_until, "<=", this.sortType);
@@ -216,7 +215,7 @@ public class DialogPassGenerateReportCtrl implements Initializable {
                 new_row.createCell(4).setCellValue(bInfo.getAddress());
 
                 if (pass.getStatus().equals("" + MainActivityController.STATUS_PRINTED)) {
-                    new_row.createCell(5).setCellValue(pass.getDatePrinted());
+                    new_row.createCell(5).setCellValue(df.format(pass.getSqlDatePrinted()));
                 } else {
                     new_row.createCell(5).setCellValue("Not Released");
                 }
@@ -254,6 +253,13 @@ public class DialogPassGenerateReportCtrl implements Initializable {
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(DialogPassGenerateReportCtrl.class.getName()).log(Level.SEVERE, null, ex);
+
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Save Error");
+                alert.setHeaderText("File not saved!");
+                alert.setContentText(ex.getMessage());
+                alert.showAndWait();
+
             } catch (IOException ex) {
                 Logger.getLogger(DialogPassGenerateReportCtrl.class.getName()).log(Level.SEVERE, null, ex);
             } finally {

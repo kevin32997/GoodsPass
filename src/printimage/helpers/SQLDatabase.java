@@ -68,6 +68,21 @@ public class SQLDatabase {
         return count;
     }
 
+    public int getLastPassInfoId() {
+        int returnValue = 0;
+        try {
+
+            ResultSet resultSet = this.stmt.executeQuery("SELECT id FROM passes ORDER BY id DESC limit 1");
+            while (resultSet.next()) {
+                returnValue = resultSet.getInt("id");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return returnValue;
+    }
+
     // Add
     public boolean createPass(Goodspass pass) {
 
@@ -514,7 +529,7 @@ public class SQLDatabase {
         return count;
     }
 
-    public void createBusinessInfo(BusinessInfo info) {
+    public boolean createBusinessInfo(BusinessInfo info) {
         try {
             String query = "INSERT into business_info ("
                     + "owner, "
@@ -543,8 +558,11 @@ public class SQLDatabase {
 
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.FINE, null, "Business Information ADDED!");
         } catch (SQLException ex) {
+
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
+        return true;
 
     }
 
@@ -1087,14 +1105,16 @@ public class SQLDatabase {
         return return_value > 0;
     }
 
-    public boolean createRemarks(int type, int remarks_id, String description) {
+    public boolean createRemarks(int type, int user_id, int remarks_id, String description) {
         int return_value = 0;
         try {
             String query = "INSERT into remarks ("
                     + "type, "
                     + "remarks_id, "
+                    + "user_id, "
                     + "description "
                     + ") values ("
+                    + "?, "
                     + "?, "
                     + "?, "
                     + "?)";
@@ -1103,7 +1123,8 @@ public class SQLDatabase {
             PreparedStatement preparedStmt = con.prepareStatement(query, new String[]{"id"});
             preparedStmt.setInt(1, type);
             preparedStmt.setInt(2, remarks_id);
-            preparedStmt.setString(3, description);
+            preparedStmt.setInt(3, user_id);
+            preparedStmt.setString(4, description);
             return_value = preparedStmt.executeUpdate();
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.FINE, null, "Remarks Information ADDED!");
         } catch (SQLException ex) {
@@ -1126,6 +1147,7 @@ public class SQLDatabase {
                 remark.setType(resultSet.getInt("type"));
                 remark.setRemarkId(resultSet.getInt("remarks_id"));
                 remark.setDescription(resultSet.getString("description"));
+                remark.setUser_id(resultSet.getInt("user_id"));
                 remark.setDateCreated(resultSet.getString("created_at"));
 
                 remarks.add(remark);
@@ -1210,6 +1232,7 @@ public class SQLDatabase {
                 user.setUsername(rs.getString("username"));
                 user.setUsertype(rs.getInt("user_type"));
                 user.setPassword(rs.getString("password"));
+                user.setActive(rs.getInt("active"));
                 user.setDateCreated(rs.getTimestamp("created_at"));
                 user.setDateUpdated(rs.getTimestamp("updated_at"));
             }
@@ -1233,7 +1256,7 @@ public class SQLDatabase {
                 user.setId(rs.getInt("id"));
                 user.setFullname(rs.getString("full_name"));
                 user.setUsername(rs.getString("username"));
-
+                user.setActive(rs.getInt("active"));
                 user.setUsertype(rs.getInt("user_type"));
                 user.setPassword(rs.getString("password"));
                 user.setDateCreated(rs.getTimestamp("created_at"));
@@ -1243,6 +1266,35 @@ public class SQLDatabase {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
         return user;
+    }
+
+    // VIEW
+    public User getUserById(int id) {
+        ObservableList<User> users = FXCollections.observableArrayList();
+        try {
+
+            ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM users WHERE id='" + id + "' limit 1");
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setFullname(resultSet.getString("full_name"));
+                user.setUsername(resultSet.getString("username"));
+                user.setUsertype(resultSet.getInt("user_type"));
+                user.setPassword(resultSet.getString("password"));
+                user.setActive(resultSet.getInt("active"));
+                user.setDateCreated(resultSet.getTimestamp("created_at"));
+                user.setDateUpdated(resultSet.getTimestamp("updated_at"));
+                users.add(user);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+        }
+        if (users.size() > 0) {
+            return users.get(0);
+        } else {
+            return null;
+        }
     }
 
     // Update
@@ -1274,6 +1326,26 @@ public class SQLDatabase {
         return true;
     }
 
+    public boolean updateUserPassword(int id, String new_password) {
+        try {
+            String query = "UPDATE users SET "
+                    + "password=? "
+                    + "WHERE id=?";
+
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, new_password);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            showError(ex);
+            return false;
+        }
+        return true;
+    }
+
     // View LIMIT
     public ObservableList<User> getUserLimitOrder(int offset, int count, String order) {
         ObservableList<User> users = FXCollections.observableArrayList();
@@ -1287,7 +1359,7 @@ public class SQLDatabase {
                 user.setUsername(resultSet.getString("username"));
                 user.setUsertype(resultSet.getInt("user_type"));
                 user.setPassword(resultSet.getString("password"));
-
+                user.setActive(resultSet.getInt("active"));
                 user.setDateCreated(resultSet.getTimestamp("created_at"));
                 user.setDateUpdated(resultSet.getTimestamp("updated_at"));
                 users.add(user);
@@ -1319,7 +1391,7 @@ public class SQLDatabase {
                 user.setUsername(resultSet.getString("username"));
                 user.setUsertype(resultSet.getInt("user_type"));
                 user.setPassword(resultSet.getString("password"));
-
+                user.setActive(resultSet.getInt("active"));
                 user.setDateCreated(resultSet.getTimestamp("created_at"));
                 user.setDateUpdated(resultSet.getTimestamp("updated_at"));
                 users.add(user);
@@ -1380,7 +1452,6 @@ public class SQLDatabase {
     }
 
     private void showError(Exception ex) {
-
         Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle("DB ERROR");

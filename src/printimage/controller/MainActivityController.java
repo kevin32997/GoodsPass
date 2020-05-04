@@ -95,6 +95,9 @@ public class MainActivityController implements Initializable {
     private TabPane mainTabPane;
 
     @FXML
+    private Label main_user_account_label;
+
+    @FXML
     private TextField ctrlNo;
 
     @FXML
@@ -125,7 +128,7 @@ public class MainActivityController implements Initializable {
     private String db_update = "";
     public static Setting settings;
 
-    private boolean appRunning = true;
+    private boolean appRunning = false;
     private boolean connected = false;
 
     public static User MAIN_USER;
@@ -148,7 +151,6 @@ public class MainActivityController implements Initializable {
 
             this.db = new SQLDatabase(settings.getServerAddress(), settings.getUsername(), settings.getPassword());
             connected = true;
-
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -202,14 +204,16 @@ public class MainActivityController implements Initializable {
             initUsersInfoField();
 
             setSettingFields();
-
-            runTableUpdateThread();
         }
+    }
+
+    public void startUpdateThread() {
+        runTableUpdateThread("On Test Connection Run");
     }
 
     public void setUser(User user) {
         MAIN_USER = user;
-
+        main_user_account_label.setText(user.getFullname());
         // Check if user is ADMIN or ENCODER
         if (user.getUsertype() == User.USER_ENCODER) {
             mainTabPane.getTabs().remove(5);
@@ -262,6 +266,34 @@ public class MainActivityController implements Initializable {
             this.openLoginForm(stage);
         }
 
+        main_user_account_label.setOnMouseClicked(e -> {
+            openUserAccountDialog();
+        });
+
+    }
+
+    private void openUserAccountDialog() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_user_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            ViewUserDialogController ctrl = (ViewUserDialogController) fxmlLoader.getController();
+            Stage stage = new Stage();
+            Scene scene = new Scene(parent, 1105, 547);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.setTitle("Account Information");
+            stage.setResizable(false);
+
+            ctrl.setData(db, MAIN_USER.getId());
+
+            ctrl.setStage(stage);
+            ctrl.setViewType(ViewUserDialogController.VIEWTYPE_USERACCOUNT);
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
@@ -861,7 +893,7 @@ public class MainActivityController implements Initializable {
 
                 // Add Pass to DB
                 if (this.db.createPass(pass)) {
-                    db.createRemarks(Remark.REMARK_PASS, MAIN_USER.getId(), db.getLastPassInfoId(), "Added by " + MAIN_USER.getFullname());
+                    db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_CREATE, MAIN_USER.getId(), db.getLastPassInfoId(), "Added by " + MAIN_USER.getFullname());
                 }
 
                 // Check if crew fields has data
@@ -1227,10 +1259,9 @@ public class MainActivityController implements Initializable {
                 info.setAddress(this.createBus_address.getText());
                 info.setContact(this.createBus_contact.getText());
                 info.setContactPerson(this.createBus_person.getText());
-                
-                
-                if(this.db.createBusinessInfo(info)){
-                    db.createRemarks(Remark.REMARK_BUSINESS,MAIN_USER.getId(),db.getLastBusinessInfoId(),"Added by "+MAIN_USER.getFullname());
+
+                if (this.db.createBusinessInfo(info)) {
+                    db.createRemarks(Remark.TARGET_BUSINESS, Remark.REMARK_CREATE, MAIN_USER.getId(), db.getLastBusinessInfoId(), "Added by " + MAIN_USER.getFullname());
                 }
 
                 db.updateDB();
@@ -1350,12 +1381,9 @@ public class MainActivityController implements Initializable {
                     openViewCrewInfoDialog(row.getItem());
                 }
             });
-
             return row;
         });
-
         setupCrewPagination();
-
     }
 
     private void initCrewInfoField() {
@@ -1998,11 +2026,9 @@ public class MainActivityController implements Initializable {
                         setUsersInfoTable(db.searchUserInfoByColumnLimit("full_name", businessInfo_search.getText().toString(), settings.getTableRowSize()));
                         break;
                 }
-
             } else {
                 this.loadUsersInfoTable();
             }
-
         });
 
         users_fullname.setOnAction(e -> {
@@ -2193,7 +2219,7 @@ public class MainActivityController implements Initializable {
             Parent parent = fxmlLoader.load();
             ViewUserDialogController ctrl = (ViewUserDialogController) fxmlLoader.getController();
             Stage stage = new Stage();
-            Scene scene = new Scene(parent, 767, 249);
+            Scene scene = new Scene(parent, 1105, 547);
 
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
@@ -2216,27 +2242,31 @@ public class MainActivityController implements Initializable {
 
     private Thread tableUpdateThread;
 
-    private void runTableUpdateThread() {
-        tableUpdateThread = new Thread(() -> {
-            while (appRunning) {
-                String text_dbUpdate = db.getDBUpdated();
-                if (!db_update.equals(text_dbUpdate)) {
-                    db_update = text_dbUpdate;
-                    Platform.runLater(() -> {
-                        // Drivers Tab
-                        notifyTables();
+    private void runTableUpdateThread(String runInfo) {
 
-                    });
+        if (!this.appRunning) {
+            appRunning = true;
+            tableUpdateThread = new Thread(() -> {
+                while (appRunning) {
+                    String text_dbUpdate = db.getDBUpdated();
+                    if (!db_update.equals(text_dbUpdate)) {
+                        db_update = text_dbUpdate;
+                        Platform.runLater(() -> {
+                            // Drivers Tab
+                            notifyTables();
+                        });
+                    }
+                    try {
+                        setLatestGPNo();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-                try {
-                    setLatestGPNo();
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
-        tableUpdateThread.start();
+            });
+            tableUpdateThread.start();
+        }
+
     }
 
     private void notifyTables() {

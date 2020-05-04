@@ -88,26 +88,35 @@ public class LoginActivityController implements Initializable {
         User user = db.checkUser(username.getText(), Helper.getMd5(password.getText()));
         System.out.println("Password hash: " + Helper.getMd5(password.getText()));
         if (user != null) {
-            // open program
+            if (user.getActive() == 1) {
 
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/main_activity_layout.fxml"));
-            AnchorPane root = null;
-            try {
-                root = (AnchorPane) loader.load();
-            } catch (IOException ex) {
-                Logger.getLogger(PrintImage.class.getName()).log(Level.SEVERE, null, ex);
+                // open program
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/main_activity_layout.fxml"));
+                AnchorPane root = null;
+                try {
+                    root = (AnchorPane) loader.load();
+                } catch (IOException ex) {
+                    Logger.getLogger(PrintImage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                Scene scene = new Scene(root);
+
+                stage.setScene(scene);
+                stage.setMaximized(true);
+                stage.setTitle("GOODS PASS REGISTRY");
+
+                MainActivityController ctrl = (MainActivityController) loader.getController();
+                ctrl.setUser(user);
+                ctrl.setStage(stage);
+                ctrl.startUpdateThread();
+                stage.show();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid");
+                alert.setHeaderText("User has been Deactivated!");
+                alert.setContentText("Contact admin for activation.");
+                alert.showAndWait();
             }
-
-            Scene scene = new Scene(root);
-
-            stage.setScene(scene);
-            stage.setMaximized(true);
-            stage.setTitle("GOODS PASS REGISTRY");
-
-            MainActivityController ctrl = (MainActivityController) loader.getController();
-            ctrl.setUser(user);
-            ctrl.setStage(stage);
-            stage.show();
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Invalid");

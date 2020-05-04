@@ -337,9 +337,9 @@ public class ViewBusinessInfoController implements Initializable {
                     // Save to db
                     if (db.updateBusinessInfo_boolean(businessInfo)) {
                         if (descriptionText.getText().equals("")) {
-                            db.createRemarks(Remark.REMARK_BUSINESS, MainActivityController.MAIN_USER.getId(), businessInfo.getId(), "BUSINESS INFORMATION UPDATED");
+                            db.createRemarks(Remark.TARGET_BUSINESS, Remark.REMARK_UPDATE, MainActivityController.MAIN_USER.getId(), businessInfo.getId(), "BUSINESS INFORMATION UPDATED");
                         } else {
-                            db.createRemarks(Remark.REMARK_BUSINESS, MainActivityController.MAIN_USER.getId(), businessInfo.getId(), descriptionText.getText());
+                            db.createRemarks(Remark.TARGET_BUSINESS, Remark.REMARK_UPDATE, MainActivityController.MAIN_USER.getId(), businessInfo.getId(), descriptionText.getText());
                         }
 
                         db.updateDB();
@@ -399,7 +399,7 @@ public class ViewBusinessInfoController implements Initializable {
                     alert.setContentText(null);
                     alert.showAndWait();
                 } else {
-                    if (db.createRemarks(Remark.REMARK_BUSINESS, MainActivityController.MAIN_USER.getId(), businessInfo.getId(), descriptionText.getText())) {
+                    if (db.createRemarks(Remark.TARGET_BUSINESS, Remark.REMARK_CUSTOM, MainActivityController.MAIN_USER.getId(), businessInfo.getId(), descriptionText.getText())) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Update Success");
                         alert.setHeaderText("Information Updated!");

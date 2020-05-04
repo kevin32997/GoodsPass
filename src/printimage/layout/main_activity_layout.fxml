@@ -275,5 +275,10 @@
             </Tab>
         </tabs>
       </TabPane>
+      <Label fx:id="main_user_account_label" layoutX="1214.0" layoutY="6.0" styleClass="user_account_label" stylesheets="@../css/label_style.css" text="Kevin Dalman Ernas" textFill="#0044ff" underline="true" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="6.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

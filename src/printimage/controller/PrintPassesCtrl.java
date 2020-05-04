@@ -289,7 +289,7 @@ public class PrintPassesCtrl implements Initializable {
         new Thread(() -> {
             for (Goodspass pass : listToPrint) {
                 if (pass.getStatus().equals("1")) {
-                    db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), pass.getId(), "REPRINTED - " + description);
+                    db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_REPRINTED, MainActivityController.MAIN_USER.getId(), pass.getId(), "REPRINTED - " + description);
                 }
             }
             System.out.println("Remarks added!");
@@ -418,7 +418,7 @@ public class PrintPassesCtrl implements Initializable {
         new Thread(() -> {
             if (!pass.getStatus().equals("1")) {
                 db.updatePassInfoPrinted(pass);
-                db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), pass.getId(), "Printed by " + MainActivityController.MAIN_USER.getFullname());
+                db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_PRINTED, MainActivityController.MAIN_USER.getId(), pass.getId(), "Printed by " + MainActivityController.MAIN_USER.getFullname());
             }
         }).start();
     }

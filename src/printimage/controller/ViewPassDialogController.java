@@ -579,9 +579,9 @@ public class ViewPassDialogController implements Initializable {
                     if (db.updatePassInfo(info)) {
 
                         if (descriptionText.getText().equals("")) {
-                            db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), "PASS INFORMATION UPDATED");
+                            db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_UPDATE, MainActivityController.MAIN_USER.getId(), this.info.getId(), "PASS INFORMATION UPDATED");
                         } else {
-                            db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText());
+                            db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_UPDATE, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText());
                         }
                         db.updateDB();
                         Alert alert = new Alert(AlertType.INFORMATION);
@@ -712,7 +712,7 @@ public class ViewPassDialogController implements Initializable {
                         alert.setHeaderText("Please add description to save!");
                         alert.showAndWait();
                     } else {
-                        if (db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
+                        if (db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_CANCEL, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
                             cancelPass();
                             stage.close();
                         }
@@ -754,7 +754,7 @@ public class ViewPassDialogController implements Initializable {
                         alert.setHeaderText("Please add description to save!");
                         alert.showAndWait();
                     } else {
-                        if (db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
+                        if (db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_APPROVE, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
                             approvePass();
                             stage.close();
                         }
@@ -825,7 +825,7 @@ public class ViewPassDialogController implements Initializable {
                     alert.setHeaderText("Please add description to save!");
                     alert.showAndWait();
                 } else {
-                    if (db.createRemarks(Remark.REMARK_PASS, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
+                    if (db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_CUSTOM, MainActivityController.MAIN_USER.getId(), this.info.getId(), descriptionText.getText())) {
                         db.updateDB();
                         Alert alert = new Alert(AlertType.INFORMATION);
                         alert.setTitle("Updated");

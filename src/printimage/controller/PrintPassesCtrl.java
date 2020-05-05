@@ -264,9 +264,7 @@ public class PrintPassesCtrl implements Initializable {
                 remarksStage.show();
 
             } else {
-
                 PrinterJob printJob = this.print(paneToPrint, printDialogStage);
-
                 Button btnCancel = (Button) progressDialog.lookup("#btnCancel");
 
                 btnCancel.setOnAction(e -> {
@@ -398,7 +396,6 @@ public class PrintPassesCtrl implements Initializable {
 
                     }
                 }
-
                 paneToPrint.add(page);
             } catch (IOException ex) {
                 Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
@@ -425,18 +422,20 @@ public class PrintPassesCtrl implements Initializable {
 
     private PrinterJob print(ObservableList<AnchorPane> pagesToPrint, Stage progressStage) {
         PrinterJob printerJob = PrinterJob.createPrinterJob();
-        if (printerJob != null) {
+        new Thread(() -> {
+            if (printerJob != null) {
+                PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, 0, 0, 0, 0);
+                for (AnchorPane pane : pagesToPrint) {
+                    printerJob.printPage(pageLayout, pane);
+                }
+                printerJob.endJob();
+                Platform.runLater(() -> {
+                    progressStage.close();
+                    updatePasses();
+                });
 
-            PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, 0, 0, 0, 0);
-
-            for (AnchorPane pane : pagesToPrint) {
-                printerJob.printPage(pageLayout, pane);
             }
-            printerJob.endJob();
-            progressStage.close();
-            updatePasses();
-
-        }
+        }).start();
         return printerJob;
     }
 

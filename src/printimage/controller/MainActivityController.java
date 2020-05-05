@@ -224,21 +224,8 @@ public class MainActivityController implements Initializable {
         this.stage = stage;
 
         this.stage.setOnHiding(e -> {
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Logout");
-            alert.setHeaderText("Logout Application");
-            alert.setContentText(null);
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                // ... user chose OK
-                appRunning = false;
-                this.openLoginForm(new Stage());
-            } else {
-                // ... user chose CANCEL or closed the dialog
-            }
-
-            //Platform.exit();
+            appRunning = false;
+            this.openLoginForm(new Stage());
         });
 
         // Set Key Events on Stage
@@ -254,7 +241,6 @@ public class MainActivityController implements Initializable {
                 mainTabPane.getSelectionModel().select(3);
             } else if (code == KeyCode.F5) {
                 mainTabPane.getSelectionModel().select(4);
-
             } else if (code == KeyCode.F6) {
                 mainTabPane.getSelectionModel().select(5);
             } else if (code == KeyCode.ESCAPE) {
@@ -957,9 +943,9 @@ public class MainActivityController implements Initializable {
             Stage stage = new Stage();
             stage.setTitle("PASS INFO (" + pass.getGpNo() + ") - " + pass.getBusinessName());
             stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initModality(Modality.NONE);
+            stage.initOwner(this.stage);
             stage.setScene(scene);
-
             ctrl.setData(stage, db, pass.getId());
 
             stage.showAndWait();
@@ -1304,8 +1290,8 @@ public class MainActivityController implements Initializable {
             ViewBusinessInfoController ctrl = (ViewBusinessInfoController) fxmlLoader.getController();
             Stage stage = new Stage();
             Scene scene = new Scene(parent, 1031, 612);
-
-            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initModality(Modality.NONE);
+            stage.initOwner(this.stage);
             stage.setScene(scene);
             stage.setTitle(info.getBusinessName());
             stage.setResizable(false);
@@ -1489,7 +1475,8 @@ public class MainActivityController implements Initializable {
             ViewCrewDialogController ctrl = (ViewCrewDialogController) fxmlLoader.getController();
             Stage stage = new Stage();
             Scene scene = new Scene(parent, 434, 385);
-            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initModality(Modality.NONE);
+            stage.initOwner(this.stage);
             stage.setScene(scene);
             stage.setTitle(crew.getFullname());
             stage.setResizable(false);
@@ -2247,6 +2234,7 @@ public class MainActivityController implements Initializable {
         if (!this.appRunning) {
             appRunning = true;
             tableUpdateThread = new Thread(() -> {
+                int i = 0;
                 while (appRunning) {
                     String text_dbUpdate = db.getDBUpdated();
                     if (!db_update.equals(text_dbUpdate)) {
@@ -2256,6 +2244,7 @@ public class MainActivityController implements Initializable {
                             notifyTables();
                         });
                     }
+                    i++;
                     try {
                         setLatestGPNo();
                         Thread.sleep(1000);

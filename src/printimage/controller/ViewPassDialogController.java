@@ -502,6 +502,9 @@ public class ViewPassDialogController implements Initializable {
             TextArea textArea = (TextArea) parent.lookup("#text_area");
             Button btnClose = (Button) parent.lookup("#btnClose");
 
+            Label remarksType = (Label) parent.lookup("#remark_type");
+            remarksType.setText("Type: " + remark.getRemarkType());
+
             User user = db.getUserById(remark.getUser_id());
 
             if (user != null) {

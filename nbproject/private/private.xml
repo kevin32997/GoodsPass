@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
         <file>
             <url>src/printimage/controller/PrintPassesCtrl.java</url>
             <bookmark id="1">
@@ -9,12 +9,21 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>src/printimage/controller/MainActivityController.java</url>
+            <bookmark id="2">
+                <name/>
+                <line>1352</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/DialogPassGenerateReportCtrl.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/PrintPassesCtrl.java</file>
             <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/helpers/SQLDatabase.java</file>
+            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/custom/ZoomableScrollPane.java</file>
+            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/ViewBusinessInfoController.java</file>
             <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/ViewPassDialogController.java</file>
             <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/MainActivityController.java</file>
             <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/ViewUserDialogController.java</file>

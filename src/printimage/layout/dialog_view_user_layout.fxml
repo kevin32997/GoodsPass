@@ -45,8 +45,8 @@
       <TableView fx:id="remarks_table" layoutX="419.0" layoutY="51.0" prefHeight="441.0" prefWidth="671.0">
         <columns>
             <TableColumn fx:id="remarks_date" prefWidth="75.0" text="DATE CREATED" />
-          <TableColumn fx:id="remarks_type" prefWidth="112.0" text="TYPE" />
-          <TableColumn fx:id="remarks_description" prefWidth="335.0" text="DESCRIPTION" />
+          <TableColumn fx:id="remarks_type" prefWidth="101.0" text="TYPE" />
+          <TableColumn fx:id="remarks_description" prefWidth="233.0" text="DESCRIPTION" />
             <TableColumn fx:id="remarks_of" prefWidth="112.0" text="REMARKS OF" />
         </columns>
          <columnResizePolicy>

@@ -125,7 +125,7 @@ public class DialogPassGenerateReportCtrl implements Initializable {
         this.progress.setVisible(true);
         new Thread(() -> {
             ZoneId defaultZoneId = ZoneId.systemDefault();
-            SimpleDateFormat df = new SimpleDateFormat("MMMMM dd, yyyy - hh:mm:ss a");
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
             ObservableList<Goodspass> passes = FXCollections.observableArrayList();
 
@@ -200,7 +200,6 @@ public class DialogPassGenerateReportCtrl implements Initializable {
 
                 Goodspass pass = passes.get(i - 1);
                 BusinessInfo bInfo = db.getBusinessInfoById(Integer.parseInt(pass.getBusinessId()));
-
                 Row new_row = spreadsheet.createRow(i);
                 Cell new_cell = new_row.createCell(0);
                 CellStyle cellStyle = new_row.getSheet().getWorkbook().createCellStyle();
@@ -215,7 +214,15 @@ public class DialogPassGenerateReportCtrl implements Initializable {
                 new_row.createCell(4).setCellValue(bInfo.getAddress());
 
                 if (pass.getStatus().equals("" + MainActivityController.STATUS_PRINTED)) {
-                    new_row.createCell(5).setCellValue(df.format(pass.getSqlDatePrinted()));
+                    System.out.println("ID is " + pass.getId());
+                    if (pass.getSqlDatePrinted() != null) {
+                        new_row.createCell(5).setCellValue(df.format(pass.getSqlDatePrinted()));
+                        System.out.println(pass.getId() + " created Successfully");
+                    } else {
+                        new_row.createCell(5).setCellValue("Printed: no_date");
+                        System.out.println(pass.getId() + " created Unsuccessful");
+                    }
+
                 } else {
                     new_row.createCell(5).setCellValue("Not Released");
                 }

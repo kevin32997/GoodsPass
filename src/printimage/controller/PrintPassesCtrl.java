@@ -190,7 +190,7 @@ public class PrintPassesCtrl implements Initializable {
 
             ctrl.setCtrl(this);
 
-            ctrl.setPages(paneToPrint);
+            ctrl.setPages(this.paneToPrint);
 
             stage.show();
         } catch (IOException ex) {
@@ -237,7 +237,7 @@ public class PrintPassesCtrl implements Initializable {
                         alert.showAndWait();
                     } else {
 
-                        PrinterJob printJob = this.print(paneToPrint, printDialogStage);
+                        PrinterJob printJob = this.print(this.paneToPrint, printDialogStage);
 
                         Button dialogBtnCancel = (Button) progressDialog.lookup("#btnCancel");
 
@@ -264,7 +264,7 @@ public class PrintPassesCtrl implements Initializable {
                 remarksStage.show();
 
             } else {
-                PrinterJob printJob = this.print(paneToPrint, printDialogStage);
+                PrinterJob printJob = this.print(this.paneToPrint, printDialogStage);
                 Button btnCancel = (Button) progressDialog.lookup("#btnCancel");
 
                 btnCancel.setOnAction(e -> {

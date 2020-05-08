@@ -135,6 +135,7 @@ public class SQLDatabase {
                     + "vehicle_desc = ?, "
                     + "vehicle_plate_no = ?, "
                     + "business_id = ?, "
+                    + "business_name = ?, "
                     + "status = ? "
                     + "WHERE id = ?";
 
@@ -144,8 +145,9 @@ public class SQLDatabase {
             ps.setString(2, info.getVehicleDesc());
             ps.setString(3, info.getVehiclePlateNo());
             ps.setString(4, info.getBusinessId());
-            ps.setInt(5, Integer.parseInt(info.getStatus()));
-            ps.setInt(6, info.getId());
+            ps.setString(5, info.getBusinessName());
+            ps.setInt(6, Integer.parseInt(info.getStatus()));
+            ps.setInt(7, info.getId());
 
             ps.executeUpdate();
 
@@ -168,6 +170,21 @@ public class SQLDatabase {
             ps.setString(1, "1");
             ps.setTimestamp(2, getCurrentTimeStamp());
             ps.setInt(3, pass.getId());
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            this.showError(ex);
+        }
+    }
+    
+    // Update Business name Column when Business name is edited
+
+    public void updatePassBusinessnameByBusiId(String new_businessName, int business_id) {
+        String sql = "UPDATE passes SET business_name = ? WHERE business_id = ?";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, new_businessName);
+            ps.setInt(2, business_id);
             ps.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);

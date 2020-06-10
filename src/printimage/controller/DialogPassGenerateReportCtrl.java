@@ -74,17 +74,14 @@ public class DialogPassGenerateReportCtrl implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
         // TODO
         date_from.valueProperty().addListener((ov, oldValue, newValue) -> {
-
             checkDates();
-
         });
 
         date_until.valueProperty().addListener((ov, oldValue, newValue) -> {
-
             checkDates();
-
         });
 
     }
@@ -99,13 +96,16 @@ public class DialogPassGenerateReportCtrl implements Initializable {
 
     private void checkDates() {
         if (date_from.getValue() == null && date_until.getValue() == null) {
-
+            
         } else if (date_from.getValue() != null && date_until.getValue() == null) {
+            this.btnGenerate.setDisable(false);
             loadData(1);
         } else if (date_from.getValue() == null && date_until.getValue() != null) {
+            this.btnGenerate.setDisable(false);
             loadData(2);
         } else if (date_from.getValue().equals(date_until.getValue())) {
             System.out.println("Has same date");
+            this.btnGenerate.setDisable(false);
             loadData(0);
         } else if (date_from.getValue().compareTo(date_until.getValue()) > 0) {
             System.out.println("Date From is greater than Date Until: Wrong!!");
@@ -113,6 +113,7 @@ public class DialogPassGenerateReportCtrl implements Initializable {
             this.btnGenerate.setDisable(true);
         } else if (date_from.getValue().compareTo(date_until.getValue()) < 0) {
             System.out.println("Date From is lesser than Date Until: Correct!!");
+            this.btnGenerate.setDisable(false);
             loadData(0);
         }
     }

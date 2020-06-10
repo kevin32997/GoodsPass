@@ -509,7 +509,6 @@ public class SQLDatabase {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
         return passes;
-
     }
 
     // View All

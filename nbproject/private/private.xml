@@ -19,17 +19,6 @@
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/DialogPassGenerateReportCtrl.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/PrintPassesCtrl.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/helpers/SQLDatabase.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/custom/ZoomableScrollPane.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/ViewBusinessInfoController.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/ViewPassDialogController.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/PrintPreviewCtrl.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/MainActivityController.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/controller/ViewUserDialogController.java</file>
-            <file>file:/C:/Users/Admin/Documents/NetBeansProjects/GoodsRegistry/src/printimage/models/Remark.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

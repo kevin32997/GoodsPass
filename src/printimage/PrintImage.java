@@ -45,7 +45,6 @@ public class PrintImage extends Application {
         ctrl.setStage(primaryStage);
 
         primaryStage.show();
-
     }
 
     /**

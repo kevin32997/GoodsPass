@@ -189,6 +189,8 @@ public class MainActivityController implements Initializable {
         }
     }
 
+    
+    // Initialize Tables and Paginations
     private void initAll() {
         if (connected) {
             initPassInfoTable();
@@ -220,6 +222,7 @@ public class MainActivityController implements Initializable {
         }
     }
 
+    //Setup the stage. Handles Changes to display on the main view
     public void setStage(Stage stage) {
         this.stage = stage;
 
@@ -258,6 +261,7 @@ public class MainActivityController implements Initializable {
 
     }
 
+    //Handles the top right corner click event
     private void openUserAccountDialog() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_user_layout.fxml"));
@@ -727,6 +731,7 @@ public class MainActivityController implements Initializable {
         });
     }
 
+    // Called by setupPassessPagination(), Sets table data by the given data set
     private void setPassInfoTableData(ObservableList<Goodspass> list) {
         pass_info_mainTable.getItems().clear();
         for (Goodspass pass : list) {
@@ -744,6 +749,7 @@ public class MainActivityController implements Initializable {
         pass_info_mainTable.refresh();
     }
 
+    // Handles the loading and setting of data in the Passes Table
     private void loadPassesTable() {
         pass_info_mainTable.getItems().clear();
         ObservableList<Goodspass> list = FXCollections.observableArrayList();
@@ -807,6 +813,8 @@ public class MainActivityController implements Initializable {
 
     private int selected_business_id = 0;
 
+    
+    // Checks if there are no missing fields, saves given data by user to the database
     private void savePassInfo() {
         BusinessInfo businessInfo = db.getBusinessInfoById(selected_business_id);
         if (businessInfo != null) {
@@ -933,6 +941,7 @@ public class MainActivityController implements Initializable {
 
     }
 
+    // Pop ups a dialog that shows the pass information when table row is clicked
     private void openViewPassDialog(Goodspass pass) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_member_layout.fxml"));
@@ -954,6 +963,7 @@ public class MainActivityController implements Initializable {
         }
     }
 
+    // Opens Print Passes Dialog 
     private void openMultiplePrint(ObservableList<Goodspass> passes) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_passes_dialog_layout.fxml"));
@@ -975,7 +985,9 @@ public class MainActivityController implements Initializable {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    
+    // Triggered when Button Saved is clicked
     @FXML
     void saveDriverInfo(ActionEvent event) {
         savePassInfo();
@@ -1000,6 +1012,8 @@ public class MainActivityController implements Initializable {
         });
     }
 
+    
+    // Action Event when button Generate Report is Clicked
     @FXML
     void onGenerateReport(ActionEvent event) {
         try {

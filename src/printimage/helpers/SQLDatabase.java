@@ -40,7 +40,7 @@ public class SQLDatabase {
 
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         con = DriverManager.getConnection(
-                "jdbc:mysql://" + URL, username, password);
+                "jdbc:mysql://" + URL+"?useSSL=false", username, password);
         stmt = con.createStatement();
 
         // Init DB Updated

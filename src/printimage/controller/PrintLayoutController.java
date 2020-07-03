@@ -17,9 +17,11 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Alert;
@@ -31,6 +33,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Transform;
@@ -40,6 +43,7 @@ import printimage.models.Passes;
 import printimage.PrintImage;
 import javafx.scene.text.Text;
 import printimage.helpers.Helper;
+import printimage.models.Crew;
 
 /**
  * FXML Controller class
@@ -72,10 +76,7 @@ public class PrintLayoutController implements Initializable {
     private Text vehicle_description;
 
     @FXML
-    private Text designation_1;
-
-    @FXML
-    private Text designation_2;
+    private VBox crew_list;
 
     @FXML
     private ImageView main_image;
@@ -122,14 +123,13 @@ public class PrintLayoutController implements Initializable {
                 stage.close();
             }
         });
-
     }
 
     public void setCtrl(ViewPassDialogController driverInfoCtrl) {
         this.driverInfoCtrl = driverInfoCtrl;
     }
 
-    public void setPasses(Passes pass) {
+    public void setPasses(Passes pass, ObservableList<Crew> crews) {
 
         this.pass = pass;
 
@@ -149,11 +149,22 @@ public class PrintLayoutController implements Initializable {
         this.vehicle_description.setText(pass.getDescription());
         autoResizeField(vehicle_description, this.pxDescription);
 
-        this.designation_1.setText(pass.getDesignation_1());
-        autoResizeField(designation_1, this.pxDes1);
+        // Load crew List
+        System.out.println("Crew size is " + crews.size());
+        for (Crew crew : crews) {
+            try {
+                FXMLLoader crewListItemFXMLLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_pass_crew_item.fxml"));
+                AnchorPane crew_item_layout = crewListItemFXMLLoader.load();
 
-        this.designation_2.setText(pass.getDesignation_2());
-        autoResizeField(designation_2, this.pxDes2);
+                Text designation_text = (Text) crew_item_layout.lookup("#designation");
+                designation_text.setText(crew.getFullname() + " - " + crew.getDesignation());
+
+                autoResizeField(designation_text, null);
+                crew_list.getChildren().add(crew_item_layout);
+            } catch (IOException ex) {
+                Logger.getLogger(PrintLayoutController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         this.ctrl_number.setText(pass.getCtrlNo());
         try {
@@ -175,12 +186,14 @@ public class PrintLayoutController implements Initializable {
         } else {
             double newFontSize = this.default_fontsize * MAX_TEXT_WIDTH / textWidth;
             text.setFont(Font.font(defaultFont.getFamily(), FontWeight.BOLD, newFontSize));
-            tf.setText(df.format(newFontSize));
+            if (tf != null) {
+                tf.setText(df.format(newFontSize));
+            }
         }
     }
-    
+
     @FXML
-    void onPrint(ActionEvent event){
+    void onPrint(ActionEvent event) {
 
     }
 
@@ -267,19 +280,6 @@ public class PrintLayoutController implements Initializable {
             }
         });
 
-        pxDes1.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.equalsIgnoreCase("") && newValue != null) {
-                this.designation_1.setStyle("-fx-font-size:" + newValue + ";"
-                        + "-fx-font-weight: bold;");
-            }
-        });
-
-        pxDes2.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.equalsIgnoreCase("") && newValue != null) {
-                this.designation_2.setStyle("-fx-font-size:" + newValue + ";"
-                        + "-fx-font-weight: bold;");
-            }
-        });
     }
 
     public static WritableImage pixelScaleAwareCanvasSnapshot(AnchorPane pane, double pixelScale) {

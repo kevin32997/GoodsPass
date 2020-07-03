@@ -421,7 +421,7 @@ public class ViewPassDialogController implements Initializable {
 
             // Hide this current window (if this is what you want)
             PrintLayoutController ctrl = (PrintLayoutController) loader.getController();
-            ctrl.setPasses(pass);
+            ctrl.setPasses(pass,db.getAllCrewByGPNo(pass.getCtrlNo()));
             ctrl.setStage(stage);
             ctrl.setCtrl(this);
 
@@ -440,7 +440,7 @@ public class ViewPassDialogController implements Initializable {
             Parent parent = fxmlLoader.load();
             CreateCrewDialogCtrl ctrl = (CreateCrewDialogCtrl) fxmlLoader.getController();
             
-            Scene scene = new Scene(parent, 400, 321);
+            Scene scene = new Scene(parent, 385, 295);
             Stage stage = new Stage();
             stage.setTitle("Add Crew");
             stage.setResizable(false);
@@ -528,10 +528,10 @@ public class ViewPassDialogController implements Initializable {
     
     @FXML
     void onAddCrew(ActionEvent event) {
-        if (crews.size() == 2) {
+        if (crews.size() >= 5) {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Operation Unable");
-            alert.setHeaderText("Unable to add! Crew limit is 2.");
+            alert.setHeaderText("Unable to add! Crew limit is 5.");
             alert.showAndWait();
         } else {
 

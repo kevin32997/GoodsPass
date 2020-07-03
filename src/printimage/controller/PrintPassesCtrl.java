@@ -39,6 +39,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -328,20 +329,19 @@ public class PrintPassesCtrl implements Initializable {
                     description.setText(pass.getVehicleDesc());
                     autoResizeField(description);
 
-                    Text designation1 = (Text) toPrint.lookup("#designation1");
-                    Text designation2 = (Text) toPrint.lookup("#designation2");
+                    VBox crew_list = (VBox) toPrint.lookup("#crew_list");
 
-                    if (crews.size() > 0) {
-                        designation1.setText(crews.get(0).getFullname() + " - " + crews.get(0).getDesignation());
-                        if (crews.size() > 1) {
-                            designation2.setText(crews.get(1).getFullname() + " - " + crews.get(1).getDesignation());
-                        } else {
-                            designation2.setText("NONE");
-                        }
+                    //Load Crew List
+                    for (Crew crew : crews) {
+                        FXMLLoader crewListItemFXMLLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_pass_crew_item.fxml"));
+                        AnchorPane crew_item_layout = crewListItemFXMLLoader.load();
+                        
+                        Text designation_text = (Text) crew_item_layout.lookup("#designation");
+                        designation_text.setText(crew.getFullname() + " - " + crew.getDesignation());
+                       
+                        autoResizeField(designation_text);
+                        crew_list.getChildren().add(crew_item_layout);
                     }
-
-                    autoResizeField(designation1);
-                    autoResizeField(designation2);
 
                     Platform.runLater(() -> {
                         try {

@@ -13,16 +13,17 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" fx:id="mainAnchor" prefHeight="849.0" prefWidth="1352.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.MainActivityController">
+<AnchorPane id="AnchorPane" fx:id="mainAnchor" prefHeight="900.0" prefWidth="1352.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.MainActivityController">
    <children>
       <TabPane fx:id="mainTabPane" layoutX="7.0" layoutY="8.0" prefHeight="582.0" prefWidth="856.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab text="PASS INFO [F1]">
             <content>
-              <AnchorPane fx:id="driver_view_search_field" minHeight="0.0" minWidth="0.0" prefHeight="749.0" prefWidth="1352.0">
+              <AnchorPane fx:id="driver_view_search_field" minHeight="0.0" minWidth="0.0" prefHeight="800.0" prefWidth="1352.0">
                      <children>
                         <TableView fx:id="pass_info_mainTable" layoutX="14.0" layoutY="96.0" prefHeight="636.0" prefWidth="755.0" stylesheets="@../css/pass_infotables_style.css" AnchorPane.bottomAnchor="69.0" AnchorPane.leftAnchor="445.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="96.0">
                           <columns>
@@ -39,19 +40,14 @@
                         </TableView>
                         <TextField fx:id="create_passNo" layoutX="118.0" layoutY="98.0" prefHeight="22.0" prefWidth="311.0" />
                         <TextField fx:id="create_business_name" layoutX="118.0" layoutY="138.0" prefHeight="22.0" prefWidth="311.0" promptText="Search Business name here . . ." />
-                        <TextField fx:id="create_plate_no" layoutX="118.0" layoutY="182.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_vehicle_desc" layoutX="119.0" layoutY="226.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_fullname" layoutX="116.0" layoutY="311.0" prefHeight="22.0" prefWidth="311.0" />
+                        <TextField fx:id="create_plate_no" layoutX="118.0" layoutY="182.0" prefHeight="22.0" prefWidth="311.0" promptText="This field is Required" />
+                        <TextField fx:id="create_vehicle_desc" layoutX="119.0" layoutY="226.0" prefHeight="22.0" prefWidth="311.0" promptText="This field is Required" />
+                        <TextField fx:id="create_fullname" layoutX="116.0" layoutY="311.0" prefHeight="22.0" prefWidth="311.0" promptText="This field is required" />
                         <TextField fx:id="create_address" layoutX="116.0" layoutY="351.0" prefHeight="22.0" prefWidth="311.0" />
                         <TextField fx:id="create_issued_id" layoutX="116.0" layoutY="390.0" prefHeight="22.0" prefWidth="311.0" />
                         <TextField fx:id="create_idNumber" layoutX="116.0" layoutY="429.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_designation" layoutX="116.0" layoutY="468.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_fullname2" layoutX="116.0" layoutY="529.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_address2" layoutX="116.0" layoutY="569.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_issued_id2" layoutX="116.0" layoutY="608.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_idNumber2" layoutX="116.0" layoutY="647.0" prefHeight="22.0" prefWidth="311.0" />
-                        <TextField fx:id="create_designation2" layoutX="116.0" layoutY="688.0" prefHeight="22.0" prefWidth="311.0" />
-                        <Button layoutX="166.0" layoutY="754.0" mnemonicParsing="false" onAction="#saveDriverInfo" prefHeight="22.0" prefWidth="111.0" text="SAVE" />
+                        <TextField fx:id="create_designation" layoutX="116.0" layoutY="468.0" prefHeight="22.0" prefWidth="311.0" promptText="This field is required" />
+                        <Button layoutX="316.0" layoutY="811.0" mnemonicParsing="false" onAction="#saveDriverInfo" prefHeight="22.0" prefWidth="111.0" text="SAVE" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="316.0" />
                         <TextField fx:id="driverInfo_search" layoutX="446.0" layoutY="64.0" prefHeight="25.0" prefWidth="300.0" promptText="Search . . ." AnchorPane.leftAnchor="446.0" AnchorPane.topAnchor="64.0" />
                         <TextField fx:id="driverInfo_pageLimit" layoutX="1137.0" layoutY="64.0" prefHeight="19.0" prefWidth="63.0" text="30" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="64.0" />
                         <Label layoutX="57.0" layoutY="102.0" prefHeight="17.0" prefWidth="52.0" text="Pass No." AnchorPane.topAnchor="102.0" />
@@ -76,17 +72,20 @@
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </Label>
-                        <Label layoutX="49.0" layoutY="533.0" text="Full name" />
-                        <Label layoutX="58.0" layoutY="573.0" text="Address" />
-                        <Label layoutX="31.0" layoutY="612.0" text="Presented ID" />
-                        <Label layoutX="37.0" layoutY="692.0" text="Designation" />
                         <Button layoutX="1062.0" layoutY="64.0" mnemonicParsing="false" onAction="#onSortypeAscending" prefHeight="25.0" prefWidth="50.0" text="ASC" AnchorPane.leftAnchor="1062.0" AnchorPane.topAnchor="64.0" />
                         <Button layoutX="1117.0" layoutY="64.0" mnemonicParsing="false" onAction="#onSortypeDescending" prefHeight="25.0" prefWidth="50.0" text="DESC" AnchorPane.leftAnchor="1117.0" AnchorPane.topAnchor="64.0" />
                         <Label layoutX="1010.0" layoutY="68.0" text="Sortype" AnchorPane.leftAnchor="1010.0" AnchorPane.topAnchor="68.0" />
                         <ChoiceBox fx:id="driverInfo_seachby" layoutX="824.0" layoutY="64.0" prefWidth="150.0" AnchorPane.leftAnchor="824.0" AnchorPane.topAnchor="64.0" />
                         <Label layoutX="39.0" layoutY="433.0" text="ID Number" />
-                        <Label layoutX="38.0" layoutY="651.0" text="ID Number" />
                         <Button layoutX="445.0" layoutY="762.0" mnemonicParsing="false" onAction="#onGenerateReport" prefHeight="25.0" prefWidth="105.0" text="Generate Report" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="445.0" />
+                        <VBox fx:id="create_crew_list" layoutX="25.0" layoutY="561.0" prefHeight="233.0" prefWidth="408.0" style="-fx-border-color: #c9c9c9; -fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="77.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="561.0" />
+                        <Label layoutX="25.0" layoutY="536.0" text="Crew List">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Button layoutX="316.0" layoutY="503.0" mnemonicParsing="false" onAction="#addCrewToList" prefHeight="22.0" prefWidth="111.0" text="ADD CREW" />
+                        <Button layoutX="28.0" layoutY="811.0" mnemonicParsing="false" onAction="#clearPassFields" prefHeight="22.0" prefWidth="111.0" text="CLEAR" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="28.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -172,22 +171,34 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0">
                      <children>
                         <TextField fx:id="ctrlNo" layoutX="191.0" layoutY="61.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
-                        <Text layoutX="60.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Business name" />
-                        <Text layoutX="51.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Business address" />
-                        <Text layoutX="41.0" layoutY="182.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vehicle Plate Number" />
-                        <Text layoutX="47.0" layoutY="217.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vehicle Description" />
-                        <Text layoutX="63.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Designation 1" />
-                        <Text layoutX="63.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Designation 2" />
-                        <Text layoutX="59.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Control number" />
+                        <Text layoutX="88.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Business name" />
+                        <Text layoutX="77.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Business address" />
+                        <Text layoutX="51.0" layoutY="183.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vehicle Plate Number" />
+                        <Text layoutX="63.0" layoutY="218.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vehicle Description" />
+                        <Text layoutX="85.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Control number" />
                         <TextField fx:id="bName" layoutX="190.0" layoutY="95.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
                         <TextField fx:id="bAddress" layoutX="190.0" layoutY="130.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
                         <TextField fx:id="plateNo" layoutX="192.0" layoutY="165.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
                         <TextField fx:id="description" layoutX="192.0" layoutY="200.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
-                        <TextField fx:id="des1" layoutX="191.0" layoutY="235.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
-                        <TextField fx:id="des2" layoutX="191.0" layoutY="268.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
-                        <Text layoutX="77.0" layoutY="320.0" strokeType="OUTSIDE" strokeWidth="0.0" text="QR CODE" />
-                        <TextField fx:id="qrCode" layoutX="191.0" layoutY="303.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
-                        <Button layoutX="233.0" layoutY="358.0" mnemonicParsing="false" onAction="#printImage" prefHeight="34.0" prefWidth="97.0" text="PREVIEW" />
+                        <Text layoutX="112.0" layoutY="257.0" strokeType="OUTSIDE" strokeWidth="0.0" text="QR CODE" />
+                        <TextField fx:id="qrCode" layoutX="190.0" layoutY="239.0" prefHeight="26.0" prefWidth="228.0" AnchorPane.leftAnchor="190.0" />
+                        <Button layoutX="811.0" layoutY="96.0" mnemonicParsing="false" onAction="#printImage" prefHeight="20.0" prefWidth="97.0" text="PREVIEW" />
+                        <VBox fx:id="custom_create_crew_list" layoutX="559.0" layoutY="132.0" prefHeight="136.0" prefWidth="408.0" style="-fx-border-color: #c9c9c9; -fx-background-color: #FFFFFF;" />
+                        <Label layoutX="451.0" layoutY="23.0" text="Crew List">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="27.0" layoutY="29.0" text="Crew List">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="custom_crew_fullname" layoutX="559.0" layoutY="61.0" prefHeight="26.0" prefWidth="227.0" />
+                        <Text layoutX="489.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fullname" />
+                        <TextField fx:id="custom_crew_designation" layoutX="559.0" layoutY="95.0" prefHeight="26.0" prefWidth="228.0" />
+                        <Text layoutX="476.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Designation" />
+                        <Button layoutX="811.0" layoutY="61.0" mnemonicParsing="false" onAction="#customAddCrewToList" prefHeight="20.0" prefWidth="97.0" text="ADD CREW" />
                      </children>
                   </AnchorPane>
             </content>

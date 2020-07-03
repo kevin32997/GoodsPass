@@ -30,6 +30,8 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +44,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
@@ -62,6 +65,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -113,13 +117,16 @@ public class MainActivityController implements Initializable {
     private TextField description;
 
     @FXML
-    private TextField des1;
-
-    @FXML
-    private TextField des2;
-
-    @FXML
     private TextField qrCode;
+
+    @FXML
+    private TextField custom_crew_fullname;
+
+    @FXML
+    private TextField custom_crew_designation;
+
+    @FXML
+    private VBox custom_create_crew_list;
 
     // Initialize Important Classes
     private SQLDatabase db;
@@ -127,6 +134,9 @@ public class MainActivityController implements Initializable {
     private Stage stage;
     private String db_update = "";
     public static Setting settings;
+
+    private HashMap<Crew, AnchorPane> customCrewItemPairedList = new HashMap<Crew, AnchorPane>();
+    private ObservableList<Crew> customCrewList;
 
     private boolean appRunning = false;
     private boolean connected = false;
@@ -140,6 +150,8 @@ public class MainActivityController implements Initializable {
 
         //Test for Debugging
     }
+    
+    
 
     private void testConnection() {
         try {
@@ -189,10 +201,12 @@ public class MainActivityController implements Initializable {
         }
     }
 
-    
     // Initialize Tables and Paginations
     private void initAll() {
         if (connected) {
+            
+            initCustomPassFields();
+            
             initPassInfoTable();
             initPassInfoField();
 
@@ -285,6 +299,76 @@ public class MainActivityController implements Initializable {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private void initCustomPassFields(){
+        customCrewList=FXCollections.observableArrayList();
+        custom_crew_fullname.setOnAction(e->{
+                custom_crew_designation.requestFocus();
+        });
+        
+        custom_crew_designation.setOnAction(e->{
+            customValidateCrewFields();
+        });
+        
+    }
+
+    private void customValidateCrewFields() {
+        if (!custom_crew_fullname.getText().equals("") && !custom_crew_designation.getText().equals("")) {
+            Crew crew = new Crew();
+            crew.setFullname(this.custom_crew_fullname.getText());
+            crew.setDesignation(this.custom_crew_designation.getText());
+            
+            customAddCrewtoList(crew);
+            
+            this.custom_crew_fullname.clear();
+            this.custom_crew_designation.clear();
+        } else {
+            // Missing fields
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Some field are empty!");
+            alert.setContentText("Please fill up required crew field before adding.");
+            alert.showAndWait();
+        }
+    }
+
+    // Add New Crew to the List
+    private void customAddCrewtoList(Crew crew) {
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/crew_list_item_layout.fxml"));
+            AnchorPane row = fxmlLoader.load();
+            Label full_name = (Label) row.lookup("#crew_fullname");
+            Label designation = (Label) row.lookup("#crew_designation");
+
+            full_name.setText(crew.getFullname());
+            designation.setText(crew.getDesignation());
+
+            // Add to list
+            this.customCrewList.add(crew);
+            this.custom_create_crew_list.getChildren().add(row);
+
+            this.customCrewItemPairedList.put(crew, row);
+
+            this.custom_crew_fullname.requestFocus();
+
+            Button btnRemove = (Button) row.lookup("#btn_remove");
+            btnRemove.setOnAction(e -> {
+                customGoodspassRemoveCrew(crew);
+            });
+
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    private void customGoodspassRemoveCrew(Crew crew){
+            this.customCrewList.remove(crew);
+        this.custom_create_crew_list.getChildren().remove(this.customCrewItemPairedList.get(crew));
+        this.customCrewItemPairedList.remove(crew);
+    }
 
     @FXML
     void printImage(ActionEvent event) {
@@ -292,12 +376,15 @@ public class MainActivityController implements Initializable {
         pass.setBusinessName(bName.getText());
         pass.setAddress(bAddress.getText());
         pass.setDescription(description.getText());
-        pass.setDesignation_1(des1.getText());
-        pass.setDesignation_2(des2.getText());
         pass.setQrCode(qrCode.getText());
         pass.setCtrlNo(ctrlNo.getText());
         pass.setPlateNo(plateNo.getText());
         openIDPreview(pass);
+    }
+
+    @FXML
+    void customAddCrewToList(ActionEvent event) {
+        customValidateCrewFields();
     }
 
     public void openIDPreview(Passes pass) {
@@ -312,7 +399,8 @@ public class MainActivityController implements Initializable {
             stage.show();
             // Hide this current window (if this is what you want)
             PrintLayoutController ctrl = (PrintLayoutController) loader.getController();
-            ctrl.setPasses(pass);
+            
+            ctrl.setPasses(pass, this.customCrewList);
             ctrl.setStage(stage);
         } catch (IOException e) {
             e.printStackTrace();
@@ -332,6 +420,7 @@ public class MainActivityController implements Initializable {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                       VIEW PASS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TABLE ///////////////////////////////////////////////////////////////////
     @FXML
     private TableView<Goodspass> pass_info_mainTable;
 
@@ -353,6 +442,13 @@ public class MainActivityController implements Initializable {
     @FXML
     private TableColumn<Goodspass, String> tablecolumn_businessName;
 
+    @FXML
+    private Pagination driverInfo_pagination;
+
+    private int table_pass_current_page = 0;
+    ////////////////////////////////////////////////////////////////////////////
+
+    // CREATE FIELDS ///////////////////////////////////////////////////////////
     @FXML
     private TextField create_passNo;
 
@@ -381,37 +477,26 @@ public class MainActivityController implements Initializable {
     private TextField create_business_name;
 
     @FXML
-    private TextField create_fullname2;
-
-    @FXML
-    private TextField create_address2;
-
-    @FXML
-    private TextField create_issued_id2;
-    @FXML
-    private TextField create_idNumber2;
-
-    @FXML
-    private TextField create_designation2;
-
-    @FXML
     private ListView<String> search_businessName_listview;
 
-    private ObservableList<BusinessInfo> searchedBusinessList;
+    @FXML
+    private VBox create_crew_list;
+    ////////////////////////////////////////////////////////////////////////////
 
+    // OTHER OPTIONS ///////////////////////////////////////////////////////////
     @FXML
     private TextField driverInfo_pageLimit;
 
     @FXML
-    private Pagination driverInfo_pagination;
-
-    @FXML
     private TextField driverInfo_search;
-
-    private int table_pass_current_page = 0;
 
     @FXML
     private ChoiceBox<String> driverInfo_seachby;
+
+    /// LIST ///////////////////////////////////////////////////////////////////
+    private ObservableList<BusinessInfo> searchedBusinessList;
+    private ObservableList<Crew> toAddCrewList;
+    private HashMap<Crew, AnchorPane> pairedList = new HashMap<Crew, AnchorPane>();
 
     private void initPassInfoTable() {
 
@@ -512,9 +597,11 @@ public class MainActivityController implements Initializable {
     }
 
     public void initPassInfoField() {
-        // Search Business field
+        // Initialize List
         searchedBusinessList = FXCollections.observableArrayList();
+        toAddCrewList = FXCollections.observableArrayList();
 
+        // Init Create Nodes
         create_passNo.setOnAction(e -> {
             create_business_name.requestFocus();
         });
@@ -607,27 +694,7 @@ public class MainActivityController implements Initializable {
         });
 
         create_designation.setOnAction(e -> {
-            create_fullname2.requestFocus();
-        });
-
-        create_fullname2.setOnAction(e -> {
-            create_address2.requestFocus();
-        });
-
-        create_address2.setOnAction(e -> {
-            create_issued_id2.requestFocus();
-        });
-
-        create_issued_id2.setOnAction(e -> {
-            create_idNumber2.requestFocus();
-        });
-
-        create_idNumber2.setOnAction(e -> {
-            create_designation2.requestFocus();
-        });
-
-        create_designation2.setOnAction(e -> {
-            savePassInfo();
+            this.validateCrewToAdd();
         });
 
         // Choice box 
@@ -669,7 +736,6 @@ public class MainActivityController implements Initializable {
                         // Plate no.
                         setPassInfoTableData(db.searchPassInfoByGivenColumnLimit("vehicle_plate_no", driverInfo_search.getText().toString(), settings.getTableRowSize()));
                         break;
-
                 }
 
             } else {
@@ -813,15 +879,56 @@ public class MainActivityController implements Initializable {
 
     private int selected_business_id = 0;
 
-    
+    // Pop ups a dialog that shows the pass information when table row is clicked
+    private void openViewPassDialog(Goodspass pass) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_member_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            ViewPassDialogController ctrl = (ViewPassDialogController) fxmlLoader.getController();
+
+            Scene scene = new Scene(parent, 866, 397);
+            Stage stage = new Stage();
+            stage.setTitle("PASS INFO (" + pass.getGpNo() + ") - " + pass.getBusinessName());
+            stage.setResizable(false);
+            stage.initModality(Modality.NONE);
+            stage.initOwner(this.stage);
+            stage.setScene(scene);
+            ctrl.setData(stage, db, pass.getId());
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Opens Print Passes Dialog 
+    private void openMultiplePrint(ObservableList<Goodspass> passes) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_passes_dialog_layout.fxml"));
+            Parent parent = fxmlLoader.load();
+            PrintPassesCtrl ctrl = (PrintPassesCtrl) fxmlLoader.getController();
+
+            Scene scene = new Scene(parent, 395, 416);
+            Stage stage = new Stage();
+            stage.setTitle("PRINT PASSES");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            ctrl.setStage(stage);
+            ctrl.setData(db, passes);
+
+            stage.showAndWait();
+        } catch (IOException ex) {
+            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     // Checks if there are no missing fields, saves given data by user to the database
     private void savePassInfo() {
         BusinessInfo businessInfo = db.getBusinessInfoById(selected_business_id);
         if (businessInfo != null) {
             Goodspass pass = new Goodspass();
-            Crew crew1 = new Crew();
-            Crew crew2 = new Crew();
-
             if (!create_passNo.getPromptText().equalsIgnoreCase("Please input valid Pass no. Example: 'ZNGP-0123'")) {
                 if (create_passNo.getText().toString().equals("")) {
                     pass.setGpNo(this.getLatestGPNo());
@@ -870,58 +977,30 @@ public class MainActivityController implements Initializable {
                 pass.setBusinessName(businessInfo.getBusinessName());
                 pass.setStatus("" + STATUS_PENDING);
 
-                // Crew info 1
-                crew1.setGpNo(pass.getGpNo());
-                crew1.setFullname(this.create_fullname.getText());
-                crew1.setAddress(this.create_address.getText());
-                crew1.setIdPresented(this.create_issued_id.getText());
-                crew1.setIdNumber(this.create_idNumber.getText());
-                crew1.setDesignation(this.create_designation.getText());
-
-                crew2.setGpNo(pass.getGpNo());
-                crew2.setFullname(this.create_fullname2.getText());
-                crew2.setAddress(this.create_address2.getText());
-                crew2.setIdPresented(this.create_issued_id2.getText());
-                crew2.setIdNumber(this.create_idNumber2.getText());
-                crew2.setDesignation(this.create_designation2.getText());
-
                 // Add Pass to DB
                 if (this.db.createPass(pass)) {
                     db.createRemarks(Remark.TARGET_PASS, Remark.REMARK_CREATE, MAIN_USER.getId(), db.getLastPassInfoId(), "Added by " + MAIN_USER.getFullname());
                 }
 
-                // Check if crew fields has data
-                if (!crew1.getFullname().equals("")) {
+                // Check if crew list has items
+                if (this.toAddCrewList.size() > 0) {
+                    for (Crew crew : toAddCrewList) {
+                        crew.setGpNo(pass.getGpNo());
+                        this.db.createCrewInfo(crew);
+                    }
 
-                    // Save crew 1
-                    this.db.createCrewInfo(crew1);
+                } else {
+                    Alert alert = new Alert(AlertType.WARNING);
+                    alert.setTitle("Create Error");
+                    alert.setHeaderText("Crew List is Empty!");
+                    alert.setContentText("Add atleast 1 crew (max of 5).");
+                    alert.showAndWait();
+                    return;
                 }
 
-                if (!crew2.getFullname().equals("")) {
-
-                    // Save crew 2
-                    this.db.createCrewInfo(crew2);
-                }
-
-                this.create_passNo.clear();
-                this.create_fullname.clear();
-                this.create_address.clear();
-                this.create_issued_id.clear();
-                this.create_designation.clear();
-                this.create_idNumber.clear();
-                this.create_vehicle_desc.clear();
-                this.create_plate_no.clear();
-                this.create_business_name.clear();
-
-                this.create_fullname2.clear();
-                this.create_address2.clear();
-                this.create_issued_id2.clear();
-                this.create_idNumber2.clear();
-                this.create_designation2.clear();
-                create_business_name.requestFocus();
+                this.clearPassFields();
                 db.updateDB();
                 setLatestGPNo();
-
             } else {
                 Alert alert = new Alert(AlertType.WARNING);
                 alert.setTitle("Unable to save!");
@@ -941,56 +1020,115 @@ public class MainActivityController implements Initializable {
 
     }
 
-    // Pop ups a dialog that shows the pass information when table row is clicked
-    private void openViewPassDialog(Goodspass pass) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_view_member_layout.fxml"));
-            Parent parent = fxmlLoader.load();
-            ViewPassDialogController ctrl = (ViewPassDialogController) fxmlLoader.getController();
+    // Validate crew fields
+    private void validateCrewToAdd() {
+        if (this.toAddCrewList.size() < 5) {
+            if (!create_fullname.getText().toString().equals("") && !create_designation.getText().toString().equals("")) {
+                // Save crew
+                Crew crew = new Crew();
+                crew.setFullname(this.create_fullname.getText());
+                crew.setDesignation(this.create_designation.getText());
+                crew.setAddress(this.create_address.getText());
+                crew.setIdPresented(this.create_issued_id.getText());
+                crew.setIdNumber(this.create_idNumber.getText());
+                addCrewtoList(crew);
 
-            Scene scene = new Scene(parent, 866, 397);
-            Stage stage = new Stage();
-            stage.setTitle("PASS INFO (" + pass.getGpNo() + ") - " + pass.getBusinessName());
-            stage.setResizable(false);
-            stage.initModality(Modality.NONE);
-            stage.initOwner(this.stage);
-            stage.setScene(scene);
-            ctrl.setData(stage, db, pass.getId());
+                // Clear Add Crew Fields
+                this.create_fullname.clear();
+                this.create_designation.clear();
+                this.create_address.clear();
+                this.create_issued_id.clear();
+                this.create_idNumber.clear();
+            } else {
+                // Missing fields
+                Alert alert = new Alert(AlertType.WARNING);
+                alert.setTitle("Create Error");
+                alert.setHeaderText("Some field are empty!");
+                alert.setContentText("Please fill up required crew field before adding.");
+                alert.showAndWait();
+            }
 
-            stage.showAndWait();
-        } catch (IOException ex) {
-            Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Add Error");
+            alert.setHeaderText("Crew Members reach its Maximum!");
+            alert.setContentText("Max Crew members is 5.");
+            alert.showAndWait();
         }
     }
 
-    // Opens Print Passes Dialog 
-    private void openMultiplePrint(ObservableList<Goodspass> passes) {
+    // Add New Crew to the List
+    private void addCrewtoList(Crew crew) {
+
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_passes_dialog_layout.fxml"));
-            Parent parent = fxmlLoader.load();
-            PrintPassesCtrl ctrl = (PrintPassesCtrl) fxmlLoader.getController();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/crew_list_item_layout.fxml"));
+            AnchorPane row = fxmlLoader.load();
+            Label full_name = (Label) row.lookup("#crew_fullname");
+            Label designation = (Label) row.lookup("#crew_designation");
 
-            Scene scene = new Scene(parent, 395, 416);
-            Stage stage = new Stage();
-            stage.setTitle("PRINT PASSES");
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
+            full_name.setText(crew.getFullname());
+            designation.setText(crew.getDesignation());
 
-            ctrl.setStage(stage);
-            ctrl.setData(db, passes);
+            // Add to list
+            this.toAddCrewList.add(crew);
+            this.create_crew_list.getChildren().add(row);
 
-            stage.showAndWait();
+            this.pairedList.put(crew, row);
+
+            create_fullname.requestFocus();
+
+            Button btnRemove = (Button) row.lookup("#btn_remove");
+            btnRemove.setOnAction(e -> {
+                removeCrew(crew);
+            });
+
         } catch (IOException ex) {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
-    
-    
+
+    // Remove Crew from List
+    private void removeCrew(Crew crew) {
+        this.toAddCrewList.remove(crew);
+        this.create_crew_list.getChildren().remove(this.pairedList.get(crew));
+        this.pairedList.remove(crew);
+    }
+
+    // Clear All Fields, restart all list
+    private void clearPassFields() {
+
+        this.create_passNo.clear();
+        this.create_fullname.clear();
+        this.create_address.clear();
+        this.create_issued_id.clear();
+        this.create_designation.clear();
+        this.create_idNumber.clear();
+        this.create_vehicle_desc.clear();
+        this.create_plate_no.clear();
+        this.create_business_name.clear();
+
+        this.create_crew_list.getChildren().clear();
+        this.toAddCrewList.clear();
+        this.pairedList.clear();
+        create_business_name.requestFocus();
+    }
+
+    // Triggered when Button Add Crew is clicked
+    @FXML
+    void addCrewToList(ActionEvent event) {
+        this.validateCrewToAdd();
+    }
+
     // Triggered when Button Saved is clicked
     @FXML
     void saveDriverInfo(ActionEvent event) {
         savePassInfo();
+    }
+
+    @FXML
+    void clearPassFields(ActionEvent event) {
+        clearPassFields();
     }
 
     private int sortype = 0;
@@ -1012,7 +1150,6 @@ public class MainActivityController implements Initializable {
         });
     }
 
-    
     // Action Event when button Generate Report is Clicked
     @FXML
     void onGenerateReport(ActionEvent event) {

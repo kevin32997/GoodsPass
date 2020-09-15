@@ -5,6 +5,8 @@
  */
 package printimage.controller;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -31,7 +33,6 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,6 +64,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -150,8 +153,6 @@ public class MainActivityController implements Initializable {
 
         //Test for Debugging
     }
-    
-    
 
     private void testConnection() {
         try {
@@ -204,9 +205,9 @@ public class MainActivityController implements Initializable {
     // Initialize Tables and Paginations
     private void initAll() {
         if (connected) {
-            
+
             initCustomPassFields();
-            
+
             initPassInfoTable();
             initPassInfoField();
 
@@ -248,6 +249,7 @@ public class MainActivityController implements Initializable {
         // Set Key Events on Stage
         this.stage.getScene().setOnKeyReleased(e -> {
             KeyCode code = e.getCode();
+
             if (code == KeyCode.F1) {
                 mainTabPane.getSelectionModel().select(0);
             } else if (code == KeyCode.F2) {
@@ -262,6 +264,14 @@ public class MainActivityController implements Initializable {
                 mainTabPane.getSelectionModel().select(5);
             } else if (code == KeyCode.ESCAPE) {
 
+            }
+            if (e.isShiftDown()) {
+                if (code == KeyCode.ENTER) {
+                    if (mainTabPane.getSelectionModel().getSelectedIndex() == 0) {
+                        // Save Here!!!
+                        savePassInfo();
+                    }
+                }
             }
         });
 
@@ -299,18 +309,18 @@ public class MainActivityController implements Initializable {
             Logger.getLogger(MainActivityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void initCustomPassFields(){
-        customCrewList=FXCollections.observableArrayList();
-        custom_crew_fullname.setOnAction(e->{
-                custom_crew_designation.requestFocus();
+    private void initCustomPassFields() {
+        customCrewList = FXCollections.observableArrayList();
+        custom_crew_fullname.setOnAction(e -> {
+            custom_crew_designation.requestFocus();
         });
-        
-        custom_crew_designation.setOnAction(e->{
+
+        custom_crew_designation.setOnAction(e -> {
             customValidateCrewFields();
         });
-        
+
     }
 
     private void customValidateCrewFields() {
@@ -318,9 +328,9 @@ public class MainActivityController implements Initializable {
             Crew crew = new Crew();
             crew.setFullname(this.custom_crew_fullname.getText());
             crew.setDesignation(this.custom_crew_designation.getText());
-            
+
             customAddCrewtoList(crew);
-            
+
             this.custom_crew_fullname.clear();
             this.custom_crew_designation.clear();
         } else {
@@ -363,9 +373,9 @@ public class MainActivityController implements Initializable {
         }
 
     }
-    
-    private void customGoodspassRemoveCrew(Crew crew){
-            this.customCrewList.remove(crew);
+
+    private void customGoodspassRemoveCrew(Crew crew) {
+        this.customCrewList.remove(crew);
         this.custom_create_crew_list.getChildren().remove(this.customCrewItemPairedList.get(crew));
         this.customCrewItemPairedList.remove(crew);
     }
@@ -399,7 +409,7 @@ public class MainActivityController implements Initializable {
             stage.show();
             // Hide this current window (if this is what you want)
             PrintLayoutController ctrl = (PrintLayoutController) loader.getController();
-            
+
             ctrl.setPasses(pass, this.customCrewList);
             ctrl.setStage(stage);
         } catch (IOException e) {
@@ -627,7 +637,14 @@ public class MainActivityController implements Initializable {
                     this.search_businessName_listview.setVisible(false);
                     searchedBusinessList.clear();
                 }
+
+                if (e.getCode() == KeyCode.DOWN) {
+                    if (this.search_businessName_listview.isVisible()) {
+                        this.search_businessName_listview.requestFocus();
+                    }
+                }
             }
+
         });
 
         create_business_name.setOnAction(e -> {
@@ -644,9 +661,11 @@ public class MainActivityController implements Initializable {
                     Parent parent = fxmlLoader.load();
                     CreateBusinessDialogCtrl ctrl = (CreateBusinessDialogCtrl) fxmlLoader.getController();
 
-                    Scene scene = new Scene(parent, 405, 336);
+                    Scene scene = new Scene(parent, 395, 305);
                     Stage stage = new Stage();
-                    stage.setTitle("Create Business Info");
+
+                    stage.getIcons().add(Helper.getFontAwesomeIcon(FontAwesomeIcon.PLUS_SQUARE_ALT));
+                    stage.setTitle("CREATE NEW BUSINESS INFO");
                     stage.setResizable(false);
 
                     ctrl.setData(stage, db, this, create_business_name.getText());
@@ -667,6 +686,19 @@ public class MainActivityController implements Initializable {
             this.create_business_name.setText(searchedBusinessList.get(search_businessName_listview.getSelectionModel().getSelectedIndex()).getBusinessName());
             selected_business_id = searchedBusinessList.get(search_businessName_listview.getSelectionModel().getSelectedIndex()).getId();
             searchedBusinessList.clear();
+            this.create_plate_no.requestFocus();
+        });
+
+        this.search_businessName_listview.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                if (search_businessName_listview.getSelectionModel().getSelectedIndex() > -1) {
+                    this.search_businessName_listview.setVisible(false);
+                    this.create_business_name.setText(searchedBusinessList.get(search_businessName_listview.getSelectionModel().getSelectedIndex()).getBusinessName());
+                    selected_business_id = searchedBusinessList.get(search_businessName_listview.getSelectionModel().getSelectedIndex()).getId();
+                    searchedBusinessList.clear();
+                    this.create_plate_no.requestFocus();
+                }
+            }
         });
 
         create_plate_no.setOnAction(e -> {
@@ -888,6 +920,7 @@ public class MainActivityController implements Initializable {
 
             Scene scene = new Scene(parent, 866, 397);
             Stage stage = new Stage();
+            stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.COMMENT_OUTLINE));
             stage.setTitle("PASS INFO (" + pass.getGpNo() + ") - " + pass.getBusinessName());
             stage.setResizable(false);
             stage.initModality(Modality.NONE);
@@ -910,6 +943,7 @@ public class MainActivityController implements Initializable {
 
             Scene scene = new Scene(parent, 395, 416);
             Stage stage = new Stage();
+            stage.getIcons().add(Helper.getFontAwesomeIcon(FontAwesomeIcon.PRINT));
             stage.setTitle("PRINT PASSES");
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -1159,6 +1193,7 @@ public class MainActivityController implements Initializable {
 
             Scene scene = new Scene(parent, 327, 272);
             Stage stage = new Stage();
+            stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.FILE_DOCUMENT_BOX));
 
             stage.setTitle("GENERATE PASS REPORT");
             stage.setResizable(false);

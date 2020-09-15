@@ -5,8 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="336.0" prefWidth="405.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="printimage.controller.CreateBusinessDialogCtrl">
+<AnchorPane id="AnchorPane" prefHeight="303.0" prefWidth="395.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.CreateBusinessDialogCtrl">
    <children>
       <Label layoutX="20.0" layoutY="30.0" text="Business name" />
       <TextField fx:id="business_name" layoutX="116.0" layoutY="26.0" prefHeight="25.0" prefWidth="257.0" />
@@ -20,7 +19,7 @@
       <TextField fx:id="contact_person" layoutX="116.0" layoutY="172.0" prefHeight="25.0" prefWidth="257.0" />
       <Label layoutX="34.0" layoutY="213.0" text="Contact No." />
       <TextField fx:id="contact_number" layoutX="116.0" layoutY="210.0" prefHeight="25.0" prefWidth="257.0" />
-      <Button layoutX="276.0" layoutY="280.0" mnemonicParsing="false" onAction="#onSave" prefHeight="17.0" prefWidth="97.0" text="Save" />
-      <Button layoutX="31.0" layoutY="280.0" mnemonicParsing="false" onAction="#onCancel" prefHeight="17.0" prefWidth="97.0" text="Cancel" />
+      <Button layoutX="276.0" layoutY="262.0" mnemonicParsing="false" onAction="#onSave" prefHeight="17.0" prefWidth="97.0" stylesheets="@../css/buttons.css" text="Save" />
+      <Button layoutX="22.0" layoutY="262.0" mnemonicParsing="false" onAction="#onCancel" prefHeight="17.0" prefWidth="97.0" stylesheets="@../css/buttons.css" text="Cancel" />
    </children>
 </AnchorPane>

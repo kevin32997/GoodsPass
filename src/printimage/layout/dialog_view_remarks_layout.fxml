@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="342.0" prefWidth="478.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" prefHeight="342.0" prefWidth="478.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="19.0" layoutY="8.0" text="Remarks">
          <font>
@@ -14,7 +14,7 @@
          </font>
       </Label>
       <TextArea fx:id="text_area" editable="false" layoutX="16.0" layoutY="96.0" prefHeight="196.0" prefWidth="448.0" promptText="Add remarks to this update . . ." />
-      <Button fx:id="btnClose" layoutX="394.0" layoutY="302.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Close" />
+      <Button fx:id="btnClose" layoutX="394.0" layoutY="308.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" stylesheets="@../css/buttons.css" text="Close" />
       <Label fx:id="remarks_of" layoutX="20.0" layoutY="72.0" prefHeight="17.0" prefWidth="440.0" text="Remarks of: " />
       <Label fx:id="date_created" alignment="CENTER_RIGHT" layoutX="160.0" layoutY="10.0" prefHeight="17.0" prefWidth="302.0" text="Date Created: " />
       <Label fx:id="created_by" layoutX="20.0" layoutY="52.0" prefHeight="17.0" prefWidth="193.0" text="Remarks by: " />

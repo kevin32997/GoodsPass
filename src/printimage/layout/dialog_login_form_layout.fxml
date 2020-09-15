@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -7,8 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="184.0" prefWidth="325.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="printimage.controller.LoginActivityController">
+<AnchorPane id="AnchorPane" prefHeight="184.0" prefWidth="325.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.LoginActivityController">
    <children>
       <Label layoutX="13.0" layoutY="14.0" text="Login Account">
          <font>
@@ -19,6 +19,9 @@
       <Label layoutX="18.0" layoutY="60.0" prefHeight="17.0" prefWidth="61.0" text="Username" />
       <Label layoutX="20.0" layoutY="96.0" prefHeight="17.0" prefWidth="52.0" text="Password" />
       <PasswordField fx:id="password" layoutX="88.0" layoutY="92.0" prefHeight="25.0" prefWidth="216.0" />
-      <Button layoutX="99.0" layoutY="140.0" mnemonicParsing="false" onAction="#onLogin" prefHeight="25.0" prefWidth="127.0" text="Login" />
+      <Button layoutX="99.0" layoutY="140.0" mnemonicParsing="false" onAction="#onLogin" prefHeight="25.0" prefWidth="127.0" stylesheets="@../css/buttons.css" text="Login">
+         <graphic>
+            <MaterialDesignIconView fill="WHITE" glyphName="LOGIN" size="20" />
+         </graphic></Button>
    </children>
 </AnchorPane>

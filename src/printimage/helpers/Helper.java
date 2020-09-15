@@ -5,17 +5,24 @@
  */
 package printimage.helpers;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.transform.Transform;
 
 /**
  *
  * @author Admin
  */
 public class Helper {
-
-
 
     public static String getMd5(String input) {
         try {
@@ -43,4 +50,19 @@ public class Helper {
         }
     }
 
+    public static Image getFontAwesomeIcon(FontAwesomeIcon icon) {
+        FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
+        WritableImage writableImage = new WritableImage(1100, 1100);
+        SnapshotParameters spa = new SnapshotParameters();
+        spa.setTransform(Transform.scale(100, 100));
+        return SwingFXUtils.toFXImage(SwingFXUtils.fromFXImage(iconView.snapshot(spa, writableImage), null), null);
+    }
+
+    public static Image getMaterialDesignIcon(MaterialDesignIcon icon) {
+        MaterialDesignIconView iconView = new MaterialDesignIconView(icon);
+        WritableImage writableImage = new WritableImage(1100, 1100);
+        SnapshotParameters spa = new SnapshotParameters();
+        spa.setTransform(Transform.scale(100, 100));
+        return SwingFXUtils.toFXImage(SwingFXUtils.fromFXImage(iconView.snapshot(spa, writableImage), null), null);
+    }
 }

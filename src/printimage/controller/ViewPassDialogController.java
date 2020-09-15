@@ -5,6 +5,7 @@
  */
 package printimage.controller;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -36,6 +37,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import printimage.helpers.Helper;
 import printimage.helpers.SQLDatabase;
 import printimage.models.BusinessInfo;
 import printimage.models.Crew;
@@ -416,6 +418,7 @@ public class ViewPassDialogController implements Initializable {
             root = loader.load();
             Scene scene = new Scene(root, 849, 714);
             Stage stage = new Stage();
+            stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.TOOLTIP_OUTLINE));
             stage.setTitle("Preview");
             stage.setScene(scene);
 
@@ -464,8 +467,10 @@ public class ViewPassDialogController implements Initializable {
             Parent parent = fxmlLoader.load();
             ViewCrewDialogController ctrl = (ViewCrewDialogController) fxmlLoader.getController();
             
-            Scene scene = new Scene(parent, 434, 385);
+            Scene scene = new Scene(parent, 430, 375);
             Stage stage = new Stage();
+            
+            stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.ACCOUNT_OUTLINE));
             stage.setTitle(this.info.getGpNo() + " - " + crew.getFullname());
             stage.setResizable(false);
             
@@ -489,6 +494,7 @@ public class ViewPassDialogController implements Initializable {
             
             Scene scene = new Scene(parent, 478, 342);
             Stage stage = new Stage();
+            stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.MESSAGE_TEXT_OUTLINE));
             stage.setTitle("Remarks - " + info.getGpNo());
             stage.setResizable(false);
             
@@ -785,6 +791,7 @@ public class ViewPassDialogController implements Initializable {
             
             Scene scene = new Scene(parent, 395, 416);
             Stage stage = new Stage();
+            stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.PRINTER));
             stage.setTitle("PRINT PASSES");
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -824,6 +831,7 @@ public class ViewPassDialogController implements Initializable {
             btnSave.setOnAction(e -> {
                 
                 if (descriptionText.getText().equals("")) {
+                    
                     Alert alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("Error");
                     alert.setHeaderText("Please add description to save!");

@@ -9,6 +9,7 @@ package printimage.helpers;
  *
  * @author Admin
  */
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,7 +30,7 @@ import printimage.models.User;
 
 public class SQLDatabase {
 
-    private static final String DB_SERVER_ADD = "jdbc:mysql://localhost:3306/goodsregistry";
+    private static final String DB_SERVER_ADD = "jdbc:mysql://localhost:3306/travel_logs";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "";
 
@@ -757,7 +758,7 @@ public class SQLDatabase {
     public ObservableList<BusinessInfo> getBusinessInfoLimitAsc(int offset, int count) {
         ObservableList<BusinessInfo> businesses = FXCollections.observableArrayList();
         try {
-
+            
             ResultSet resultSet = this.stmt.executeQuery("SELECT * FROM business_info ORDER BY id LIMIT " + offset + "," + count);
             while (resultSet.next()) {
                 BusinessInfo info = new BusinessInfo();
@@ -808,9 +809,7 @@ public class SQLDatabase {
 
             PreparedStatement ps = this.con.prepareStatement(query);
             ps.setString(1, "%" + text + "%");
-
             System.out.println("Query: " + ps);
-
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 BusinessInfo info = new BusinessInfo();
@@ -823,7 +822,6 @@ public class SQLDatabase {
                 info.setContactPerson(resultSet.getString("contact"));
                 businesses.add(info);
             }
-
         } catch (SQLException ex) {
             Logger.getLogger(SQLDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }

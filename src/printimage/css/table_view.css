@@ -1,0 +1,107 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : May 29, 2020, 4:32:25 PM
+    Author     : Admin
+*/
+
+.table-view{
+   -fx-background-color: transparent;
+}
+
+.table-view:focused{
+    -fx-background-color: transparent;
+}
+
+/* Spaltenköpfe
+    Struktur column-header-background -> column-header */
+
+.table-view .column-header-background{
+    -fx-background-color: #818181
+}
+
+.table-view .column-header-background .label{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+}
+
+
+.table-row-cell:selected {
+    -fx-background-color: #005797;
+    -fx-background-insets: 0;
+    -fx-background-radius: 1;
+}
+
+.table-view > .virtual-flow > .scroll-bar:vertical,
+.table-view > .virtual-flow > .scroll-bar:vertical > .track,
+.table-view > .virtual-flow > .scroll-bar:vertical > .track-background, 
+.table-view > .virtual-flow > .scroll-bar:horizontal,
+.table-view > .virtual-flow > .scroll-bar:horizontal > .track,
+.table-view > .virtual-flow > .scroll-bar:horizontal > .track-background {
+    -fx-background-color: transparent;
+}
+
+
+
+.table-view > .virtual-flow > .scroll-bar > .increment-button, 
+.table-view > .virtual-flow > .scroll-bar > .decrement-button {
+    -fx-opacity: 0;
+}
+
+
+.statusPending:selected{
+    -fx-background-color: steelblue; 
+
+}
+
+.statusPending {
+    -fx-background-color: #FEF9E7; 
+
+}
+
+.statusPending .cell{
+
+    -fx-border-color: steelblue;
+    -fx-border-width: 0.5px;
+}
+
+.statusHold:selected{
+    -fx-background-color: steelblue; 
+
+}
+
+.statusHold {
+    -fx-background-color: #F2D7D5; 
+}
+
+.statusHold .cell{
+
+    -fx-border-color: steelblue;
+    -fx-border-width: 0.5px;
+}
+
+.statusPrinted:selected{
+    -fx-background-color: steelblue; 
+
+}
+
+.statusPrinted {
+    -fx-background-color: #EAFAF1; 
+
+}
+
+.statusPrinted .cell{
+
+    -fx-border-color: steelblue;
+    -fx-border-width: 0.5px;
+}
+
+
+

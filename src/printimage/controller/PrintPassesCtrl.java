@@ -54,6 +54,7 @@ import printimage.models.Crew;
 import printimage.models.Goodspass;
 import printimage.models.Remark;
 
+
 /**
  * FXML Controller class
  *
@@ -71,6 +72,9 @@ public class PrintPassesCtrl implements Initializable {
     private ObservableList<AnchorPane> paneToPrint;
 
     @FXML
+    private Label default_printer_label;
+
+    @FXML
     private Label passes_size;
 
     private Stage stage;
@@ -85,11 +89,19 @@ public class PrintPassesCtrl implements Initializable {
     @FXML
     private ProgressIndicator progress;
 
+    private PrinterJob printerJob;
+
     private boolean isReprinted = false;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        setupDefaultPrinter();
+    }
+
+    private void setupDefaultPrinter() {
+        printerJob = PrinterJob.createPrinterJob();
+        default_printer_label.setText(printerJob.getPrinter().getName());
     }
 
     public void setStage(Stage stage) {
@@ -202,6 +214,7 @@ public class PrintPassesCtrl implements Initializable {
     @FXML
     void onPrintAll(ActionEvent event) {
         try {
+
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_printall_progress_layout.fxml"));
             AnchorPane progressDialog = fxmlLoader.load();
 
@@ -238,14 +251,14 @@ public class PrintPassesCtrl implements Initializable {
                         alert.showAndWait();
                     } else {
 
-                        PrinterJob printJob = this.print(this.paneToPrint, printDialogStage);
+                        this.print(this.paneToPrint, printDialogStage);
 
                         Button dialogBtnCancel = (Button) progressDialog.lookup("#btnCancel");
 
                         dialogBtnCancel.setOnAction(ev -> {
-                            if (printJob != null) {
-                                printJob.cancelJob();
-                                printJob.endJob();
+                            if (printerJob != null) {
+                                printerJob.cancelJob();
+                                printerJob.endJob();
                                 printDialogStage.close();
                             }
                         });
@@ -265,13 +278,13 @@ public class PrintPassesCtrl implements Initializable {
                 remarksStage.show();
 
             } else {
-                PrinterJob printJob = this.print(this.paneToPrint, printDialogStage);
+                this.print(this.paneToPrint, printDialogStage);
                 Button btnCancel = (Button) progressDialog.lookup("#btnCancel");
 
                 btnCancel.setOnAction(e -> {
-                    if (printJob != null) {
-                        printJob.cancelJob();
-                        printJob.endJob();
+                    if (this.printerJob != null) {
+                        printerJob.cancelJob();
+                        printerJob.endJob();
                         printDialogStage.close();
                     }
                 });
@@ -335,10 +348,10 @@ public class PrintPassesCtrl implements Initializable {
                     for (Crew crew : crews) {
                         FXMLLoader crewListItemFXMLLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/print_pass_crew_item.fxml"));
                         AnchorPane crew_item_layout = crewListItemFXMLLoader.load();
-                        
+
                         Text designation_text = (Text) crew_item_layout.lookup("#designation");
                         designation_text.setText(crew.getFullname() + " - " + crew.getDesignation());
-                       
+
                         autoResizeField(designation_text);
                         crew_list.getChildren().add(crew_item_layout);
                     }
@@ -365,8 +378,14 @@ public class PrintPassesCtrl implements Initializable {
                 }
             }
 
-            // End
-            setupPages();
+            try {
+                // End
+
+                Thread.sleep(1000);
+                setupPages();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PrintPassesCtrl.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         }).start();
     }
@@ -420,8 +439,7 @@ public class PrintPassesCtrl implements Initializable {
         }).start();
     }
 
-    private PrinterJob print(ObservableList<AnchorPane> pagesToPrint, Stage progressStage) {
-        PrinterJob printerJob = PrinterJob.createPrinterJob();
+    private void print(ObservableList<AnchorPane> pagesToPrint, Stage progressStage) {
         new Thread(() -> {
             if (printerJob != null) {
                 PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, 0, 0, 0, 0);
@@ -433,10 +451,8 @@ public class PrintPassesCtrl implements Initializable {
                     progressStage.close();
                     updatePasses();
                 });
-
             }
         }).start();
-        return printerJob;
     }
 
     private void updatePasses() {
@@ -444,6 +460,12 @@ public class PrintPassesCtrl implements Initializable {
             updatePassInfo(pass);
         }
         db.updateDB();
+    }
+
+    @FXML
+    void onSettingsClicked(ActionEvent event) {
+        printerJob.showPrintDialog(stage);
+        this.default_printer_label.setText(printerJob.getPrinter().getName());
     }
 
 }

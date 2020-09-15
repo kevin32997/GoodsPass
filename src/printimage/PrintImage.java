@@ -5,6 +5,7 @@
  */
 package printimage;
 
+import java.io.File;
 import printimage.controller.MainActivityController;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -41,6 +43,15 @@ public class PrintImage extends Application {
         primaryStage.setMaximized(true);
         primaryStage.setTitle("GOODS PASS REGISTRY");
 
+        File app_icon = new File("res/app_icon.png");
+        System.out.println("File path: " + app_icon.getAbsolutePath());
+        if (app_icon.exists()) {
+            System.out.println("Icon exist");
+        } else {
+            System.out.println("Icon dont exist");
+        }
+
+        primaryStage.getIcons().add(new Image(app_icon.toURI().toString()));
         MainActivityController ctrl = (MainActivityController) loader.getController();
         ctrl.setStage(primaryStage);
 

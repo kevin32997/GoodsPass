@@ -26,6 +26,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -41,6 +42,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import printimage.helpers.SQLDatabase;
 import printimage.models.BusinessInfo;
 import printimage.models.Goodspass;
+import printimage.models.Passes;
 
 /**
  * FXML Controller class
@@ -69,6 +71,38 @@ public class DialogPassGenerateReportCtrl implements Initializable {
 
     private String sortType = "DESC";
 
+    ////////////////////////////////////////////
+    @FXML
+    private CheckBox cb_id;
+
+    @FXML
+    private CheckBox cb_proprietor;
+
+    @FXML
+    private CheckBox cb_businessName;
+
+    @FXML
+    private CheckBox cb_passId;
+
+    @FXML
+    private CheckBox cb_address;
+
+    @FXML
+    private CheckBox cb_dateReleased;
+
+    @FXML
+    private CheckBox cb_vehicleDesc;
+
+    @FXML
+    private CheckBox cb_plateNumber;
+
+    // Dates
+    private ZoneId defaultZoneId;
+    private SimpleDateFormat df;
+    private Workbook workbook;
+
+    private ObservableList<Goodspass> passes;
+
     /**
      * Initializes the controller class.
      */
@@ -84,6 +118,10 @@ public class DialogPassGenerateReportCtrl implements Initializable {
             checkDates();
         });
 
+        // Date
+        defaultZoneId = ZoneId.systemDefault();
+        df = new SimpleDateFormat("yyyy-MM-dd");
+
     }
 
     public void setStage(Stage stage) {
@@ -96,7 +134,7 @@ public class DialogPassGenerateReportCtrl implements Initializable {
 
     private void checkDates() {
         if (date_from.getValue() == null && date_until.getValue() == null) {
-            
+
         } else if (date_from.getValue() != null && date_until.getValue() == null) {
             this.btnGenerate.setDisable(false);
             loadData(1);
@@ -118,128 +156,172 @@ public class DialogPassGenerateReportCtrl implements Initializable {
         }
     }
 
-    private Workbook workbook;
-    private Sheet spreadsheet;
-
     private void loadData(int search_type) {
 
-        this.progress.setVisible(true);
-        new Thread(() -> {
-            ZoneId defaultZoneId = ZoneId.systemDefault();
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        passes = FXCollections.observableArrayList();
+        if (search_type == 0) {
 
-            ObservableList<Goodspass> passes = FXCollections.observableArrayList();
+            LocalDate dateFrom = date_from.getValue();
+            LocalDate dateUntil = date_until.getValue().plusDays(1);
+            String text_date_from = df.format(Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant()));
+            String text_date_until = df.format(Date.from(dateUntil.atStartOfDay(defaultZoneId).toInstant()));
+            passes = db.getPassByDate(text_date_from, text_date_until, this.sortType);
+        } else if (search_type == 1) {
 
-            if (search_type == 0) {
+            LocalDate dateFrom = date_from.getValue();
+            String text_date_from = df.format(Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant()));
+            passes = db.getPassByDateOperation(text_date_from, ">=", this.sortType);
+        } else if (search_type == 2) {
 
-                LocalDate dateFrom = date_from.getValue();
-                LocalDate dateUntil = date_until.getValue().plusDays(1);
-                String text_date_from = df.format(Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant()));
-                String text_date_until = df.format(Date.from(dateUntil.atStartOfDay(defaultZoneId).toInstant()));
-                passes = db.getPassByDate(text_date_from, text_date_until, this.sortType);
-            } else if (search_type == 1) {
+            LocalDate dateUntil = date_until.getValue();
+            String text_date_until = df.format(Date.from(dateUntil.atStartOfDay(defaultZoneId).toInstant()));
+            passes = db.getPassByDateOperation(text_date_until, "<=", this.sortType);
+        }
+        System.out.println("Pass size is " + passes.size());
+    }
 
-                LocalDate dateFrom = date_from.getValue();
-                String text_date_from = df.format(Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant()));
-                passes = db.getPassByDateOperation(text_date_from, ">=", this.sortType);
-            } else if (search_type == 2) {
+    private void setupPassToExcel(ObservableList<Goodspass> passes) {
 
-                LocalDate dateUntil = date_until.getValue();
-                String text_date_until = df.format(Date.from(dateUntil.atStartOfDay(defaultZoneId).toInstant()));
-                passes = db.getPassByDateOperation(text_date_until, "<=", this.sortType);
-            }
+        workbook = new HSSFWorkbook();
+        Sheet spreadsheet = workbook.createSheet("Goodspass Report");
 
-            System.out.println("Pass size is " + passes.size());
+        spreadsheet.setColumnWidth(0, 10 * 255);
+        spreadsheet.setColumnWidth(1, 15 * 255);
+        spreadsheet.setColumnWidth(2, 50 * 255);
+        spreadsheet.setColumnWidth(3, 50 * 255);
+        spreadsheet.setColumnWidth(4, 50 * 255);
+        spreadsheet.setColumnWidth(5, 18 * 255);
+        spreadsheet.setColumnWidth(6, 20 * 255);
+        spreadsheet.setColumnWidth(7, 20 * 255);
 
-            workbook = new HSSFWorkbook();
-            spreadsheet = workbook.createSheet("Goodspass Report");
+        Row row = spreadsheet.createRow(0);
+        CellStyle columnStyle = row.getSheet().getWorkbook().createCellStyle();
+        columnStyle.setAlignment(CellStyle.ALIGN_CENTER);
 
-            spreadsheet.setColumnWidth(0, 10 * 255);
-            spreadsheet.setColumnWidth(1, 15 * 255);
-            spreadsheet.setColumnWidth(2, 50 * 255);
-            spreadsheet.setColumnWidth(3, 50 * 255);
-            spreadsheet.setColumnWidth(4, 50 * 255);
-            spreadsheet.setColumnWidth(5, 18 * 255);
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) 12);
+        font.setFontName("Calibri");
+        font.setBold(true);
+        columnStyle.setFont(font);
 
-            Row row = spreadsheet.createRow(0);
-            CellStyle columnStyle = row.getSheet().getWorkbook().createCellStyle();
-            columnStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        row.setHeight((short) 500);
 
-            Font font = workbook.createFont();
-            font.setFontHeightInPoints((short) 12);
-            font.setFontName("Calibri");
-            font.setBold(true);
-            columnStyle.setFont(font);
+        int columnCount = 0;
 
-            row.setHeight((short) 500);
+        if (this.cb_id.isSelected()) {
 
-            Cell cell_id = row.createCell(0);
+            Cell cell_id = row.createCell(columnCount);
             cell_id.setCellValue("ID");
             cell_id.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-            Cell cell_gpno = row.createCell(1);
+        if (this.cb_passId.isSelected()) {
+            Cell cell_gpno = row.createCell(columnCount);
             cell_gpno.setCellValue("GPASS NO.");
             cell_gpno.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-            Cell business_name = row.createCell(2);
+        if (this.cb_businessName.isSelected()) {
+            Cell business_name = row.createCell(columnCount);
             business_name.setCellValue("BUSINESS NAME");
             business_name.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-            Cell business_owner = row.createCell(3);
-            business_owner.setCellValue("BUSINESS OWNER");
+        if (this.cb_proprietor.isSelected()) {
+            Cell business_owner = row.createCell(columnCount);
+            business_owner.setCellValue("PROPRIETOR");
             business_owner.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-            Cell address = row.createCell(4);
+        if (this.cb_address.isSelected()) {
+            Cell address = row.createCell(columnCount);
             address.setCellValue("ADDRESS");
             address.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-            Cell date_released = row.createCell(5);
+        if (this.cb_dateReleased.isSelected()) {
+            Cell date_released = row.createCell(columnCount);
             date_released.setCellValue("DATE RELEASED");
             date_released.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-            for (int i = 1; i <= passes.size(); i++) {
+        if (this.cb_vehicleDesc.isSelected()) {
+            Cell vehicle_desc = row.createCell(columnCount);
+            vehicle_desc.setCellValue("VEHICLE DESC");
+            vehicle_desc.setCellStyle(columnStyle);
+            columnCount++;
+        }
 
-                Goodspass pass = passes.get(i - 1);
-                BusinessInfo bInfo = db.getBusinessInfoById(Integer.parseInt(pass.getBusinessId()));
-                Row new_row = spreadsheet.createRow(i);
-                Cell new_cell = new_row.createCell(0);
-                CellStyle cellStyle = new_row.getSheet().getWorkbook().createCellStyle();
-                cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        if (this.cb_plateNumber.isSelected()) {
+            Cell plate_num = row.createCell(columnCount);
+            plate_num.setCellValue("PLATE NUMBER");
+            plate_num.setCellStyle(columnStyle);
+        }
 
-                new_cell.setCellStyle(cellStyle);
-                new_cell.setCellValue(pass.getId());
+        for (int i = 1; i <= passes.size(); i++) {
 
-                new_row.createCell(1).setCellValue(pass.getGpNo());
-                new_row.createCell(2).setCellValue(bInfo.getBusinessName());
-                new_row.createCell(3).setCellValue(bInfo.getOwner());
-                new_row.createCell(4).setCellValue(bInfo.getAddress());
+            Goodspass pass = passes.get(i - 1);
+            BusinessInfo bInfo = db.getBusinessInfoById(Integer.parseInt(pass.getBusinessId()));
+            Row new_row = spreadsheet.createRow(i);
 
+            CellStyle cellStyle = new_row.getSheet().getWorkbook().createCellStyle();
+            cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+            int cellCount = 0;
+
+            if (this.cb_id.isSelected()) {
+                new_row.createCell(cellCount++).setCellValue(pass.getId());
+            }
+            if (this.cb_passId.isSelected()) {
+                new_row.createCell(cellCount++).setCellValue(pass.getGpNo());
+            }
+
+            if (this.cb_businessName.isSelected()) {
+                new_row.createCell(cellCount++).setCellValue(bInfo.getBusinessName());
+            }
+
+            if (this.cb_proprietor.isSelected()) {
+                new_row.createCell(cellCount++).setCellValue(bInfo.getOwner());
+            }
+
+            if (this.cb_address.isSelected()) {
+                new_row.createCell(cellCount++).setCellValue(bInfo.getAddress());
+            }
+
+            if (this.cb_dateReleased.isSelected()) {
                 if (pass.getStatus().equals("" + MainActivityController.STATUS_PRINTED)) {
-                    System.out.println("ID is " + pass.getId());
+                    System.out.println("ID is " + pass.getGpNo());
                     if (pass.getSqlDatePrinted() != null) {
-                        new_row.createCell(5).setCellValue(df.format(pass.getSqlDatePrinted()));
+                        new_row.createCell(cellCount).setCellValue(df.format(pass.getSqlDatePrinted()));
                         System.out.println(pass.getId() + " created Successfully");
                     } else {
-                        new_row.createCell(5).setCellValue("Printed: no_date");
+                        new_row.createCell(cellCount).setCellValue("Printed: no_date");
                         System.out.println(pass.getId() + " created Unsuccessful");
                     }
 
                 } else {
-                    new_row.createCell(5).setCellValue("Not Released");
+                    new_row.createCell(cellCount).setCellValue("Not Released");
                 }
-
+                cellCount++;
             }
 
-            Platform.runLater(() -> {
-                this.btnGenerate.setDisable(false);
-                this.progress.setVisible(false);
-                setLabelInfo("Ready to Generate!", true, true);
-            });
+            if (this.cb_vehicleDesc.isSelected()) {
+                new_row.createCell(cellCount++).setCellValue(pass.getVehicleDesc());
+            }
 
-        }).start();
+            if (this.cb_plateNumber.isSelected()) {
+                new_row.createCell(cellCount).setCellValue(pass.getVehiclePlateNo());
+            }
+        }
+
     }
 
-    private void startExport() {
+    private void openSaveWindow() {
         FileChooser fileChooser = new FileChooser();
         //Set extension filter for text files
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("EXCEL files (*.xls)", "*.xls");
@@ -278,6 +360,19 @@ public class DialogPassGenerateReportCtrl implements Initializable {
                 }
             }
         }
+    }
+
+    private void startExport() {
+        this.progress.setVisible(true);
+        new Thread(() -> {
+            this.setupPassToExcel(passes);
+            Platform.runLater(() -> {
+                this.btnGenerate.setDisable(false);
+                this.progress.setVisible(false);
+                setLabelInfo("Ready to Generate!", true, true);
+                openSaveWindow();
+            });
+        }).start();
 
     }
 

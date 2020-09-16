@@ -1191,7 +1191,7 @@ public class MainActivityController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("printimage/layout/dialog_pass_generatereport_layout.fxml"));
             Parent parent = fxmlLoader.load();
 
-            Scene scene = new Scene(parent, 327, 272);
+            Scene scene = new Scene(parent, 324, 344);
             Stage stage = new Stage();
             stage.getIcons().add(Helper.getMaterialDesignIcon(MaterialDesignIcon.FILE_DOCUMENT_BOX));
 
@@ -1359,6 +1359,7 @@ public class MainActivityController implements Initializable {
         });
 
         // Choice Box
+        
         ObservableList<String> list = FXCollections.observableArrayList();
         list.add("Owner");
         list.add("Business name");

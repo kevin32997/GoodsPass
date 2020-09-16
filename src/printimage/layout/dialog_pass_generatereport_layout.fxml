@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="272.0" prefWidth="327.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.DialogPassGenerateReportCtrl">
+<AnchorPane id="AnchorPane" prefHeight="344.0" prefWidth="323.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.DialogPassGenerateReportCtrl">
    <children>
-      <DatePicker fx:id="date_from" layoutX="54.0" layoutY="52.0" prefHeight="25.0" prefWidth="255.0" />
-      <DatePicker fx:id="date_until" layoutX="54.0" layoutY="87.0" prefHeight="25.0" prefWidth="255.0" />
-      <Label layoutX="14.0" layoutY="56.0" text="From" />
-      <Label layoutX="14.0" layoutY="91.0" text="Until" />
-      <Label layoutX="14.0" layoutY="15.0" text="Generate Passes Report">
+      <DatePicker fx:id="date_from" layoutX="55.0" layoutY="179.0" prefHeight="25.0" prefWidth="255.0" />
+      <DatePicker fx:id="date_until" layoutX="55.0" layoutY="214.0" prefHeight="25.0" prefWidth="255.0" />
+      <Label layoutX="15.0" layoutY="183.0" text="From" />
+      <Label layoutX="15.0" layoutY="218.0" text="Until" />
+      <Label layoutX="15.0" layoutY="152.0" text="Generate Passes Report">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <ProgressIndicator fx:id="progress" layoutX="140.0" layoutY="173.0" prefHeight="32.0" prefWidth="47.0" visible="false" />
-      <Button fx:id="btnGenerate" disable="true" layoutX="83.0" layoutY="223.0" mnemonicParsing="false" onAction="#onExportExcel" prefHeight="25.0" prefWidth="162.0" stylesheets="@../css/buttons.css" text="Generate Excel Report" />
-      <Label fx:id="label_info" layoutX="54.0" layoutY="156.0" prefHeight="17.0" prefWidth="255.0" style="-fx-text-fill: darkgreen;" text="Ready to Generate!" visible="false">
+      <ProgressIndicator fx:id="progress" layoutX="277.0" layoutY="17.0" prefHeight="34.0" prefWidth="33.0" visible="false" />
+      <Button fx:id="btnGenerate" disable="true" layoutX="81.0" layoutY="309.0" mnemonicParsing="false" onAction="#onExportExcel" prefHeight="25.0" prefWidth="162.0" stylesheets="@../css/buttons.css" text="Generate Excel Report" />
+      <Label fx:id="label_info" layoutX="55.0" layoutY="283.0" prefHeight="17.0" prefWidth="255.0" style="-fx-text-fill: darkgreen;" text="Ready to Generate!" visible="false">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="14.0" layoutY="124.0" text="Sort by Pass ID" />
-      <Button layoutX="213.0" layoutY="120.0" mnemonicParsing="false" onAction="#onDescending" prefHeight="25.0" prefWidth="94.0" stylesheets="@../css/buttons.css" text="Descending" />
-      <Button layoutX="108.0" layoutY="120.0" mnemonicParsing="false" onAction="#onAscending" prefHeight="25.0" prefWidth="94.0" stylesheets="@../css/buttons.css" text="Ascending" />
+      <Label layoutX="15.0" layoutY="251.0" text="Sort by Pass ID" />
+      <Button layoutX="214.0" layoutY="247.0" mnemonicParsing="false" onAction="#onDescending" prefHeight="25.0" prefWidth="94.0" stylesheets="@../css/buttons.css" text="Descending" />
+      <Button layoutX="109.0" layoutY="247.0" mnemonicParsing="false" onAction="#onAscending" prefHeight="25.0" prefWidth="94.0" stylesheets="@../css/buttons.css" text="Ascending" />
+      <CheckBox fx:id="cb_id" layoutX="17.0" layoutY="44.0" mnemonicParsing="false" text="ID" />
+      <Label layoutX="15.0" layoutY="14.0" text="Tables">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="cb_proprietor" layoutX="17.0" layoutY="78.0" mnemonicParsing="false" text="Proprietor" />
+      <CheckBox fx:id="cb_businessName" layoutX="152.0" layoutY="44.0" mnemonicParsing="false" text="Business name" />
+      <CheckBox fx:id="cb_passId" layoutX="62.0" layoutY="44.0" mnemonicParsing="false" text="GPASS No." />
+      <CheckBox fx:id="cb_address" layoutX="96.0" layoutY="78.0" mnemonicParsing="false" text="Address" />
+      <CheckBox fx:id="cb_dateReleased" layoutX="168.0" layoutY="78.0" mnemonicParsing="false" text="Date Released" />
+      <CheckBox fx:id="cb_vehicleDesc" layoutX="17.0" layoutY="113.0" mnemonicParsing="false" text="Vehicle Description" />
+      <CheckBox fx:id="cb_plateNumber" layoutX="149.0" layoutY="113.0" mnemonicParsing="false" text="Plate number" />
    </children>
 </AnchorPane>

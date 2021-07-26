@@ -1825,7 +1825,7 @@ public class MainActivityController implements Initializable {
                         // Fullname
                         System.out.println("Driver Fullname: " + row.getCell(2).getStringCellValue());
                         if (row.getCell(2) != null) {
-                            new_driverInfo.setFullname(row.getCell(2).getStringCellValue());
+                            new_driverInfo.setFullname(row.getCell(2).getStri   ngCellValue());
                         } else {
                             new_driverInfo.setFullname("");
                         }

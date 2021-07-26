@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="main_anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.PrintPreviewCtrl">
+   <children>
+      <Button layoutX="696.0" layoutY="18.0" mnemonicParsing="false" onAction="#onPrint" prefHeight="25.0" prefWidth="60.0" text="Print" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="18.0" />
+      <Label fx:id="page_count" layoutX="14.0" layoutY="22.0" text="Pages: 0" />
+   </children>
+</AnchorPane>

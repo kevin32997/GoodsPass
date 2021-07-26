@@ -30,7 +30,6 @@ and open the template in the editor.
 
 .statusHold {
     -fx-background-color: #F2D7D5; 
-
 }
 
 .statusHold .cell{
@@ -45,7 +44,7 @@ and open the template in the editor.
 }
 
 .statusPrinted {
-    -fx-background-color: #EAFAF1; 
+    -fx-background-color: #009688; 
 
 }
 

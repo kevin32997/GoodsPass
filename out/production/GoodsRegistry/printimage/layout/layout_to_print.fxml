@@ -6,45 +6,17 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" fx:id="main_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="846.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.PrintLayoutController">
+<AnchorPane id="AnchorPane" fx:id="main_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="846.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="printimage.controller.PrintLayoutController">
    <children>
       <ImageView fitHeight="885.0" fitWidth="551.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../res/GoodsPass_Official.png" />
+            <Image url="@../res/goodspassofficial.jpg" />
          </image>
       </ImageView>
-      <Label fx:id="business_name" layoutX="212.0" layoutY="306.0" prefHeight="15.0" prefWidth="298.0" text="EVERGOOD DELIVERY AND FREIGHT SERVICES" AnchorPane.bottomAnchor="391.0">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
-      <Label fx:id="business_address" layoutX="212.0" layoutY="330.0" prefHeight="15.0" prefWidth="298.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="367.0">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
-      <Label fx:id="vehicle_plate_number" layoutX="212.0" layoutY="354.0" prefHeight="15.0" prefWidth="298.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="343.0">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
-      <Label fx:id="vehicle_description" layoutX="212.0" layoutY="380.0" prefHeight="15.0" prefWidth="298.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="317.0">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
-      <Label fx:id="designation_1" layoutX="190.0" layoutY="445.0" prefHeight="15.0" prefWidth="317.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="252.0">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
-      <Label fx:id="designation_2" layoutX="190.0" layoutY="474.0" prefHeight="15.0" prefWidth="317.0" text="Dipolog City Hall" AnchorPane.bottomAnchor="223.0">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
       <ImageView fx:id="main_image" fitHeight="173.0" fitWidth="169.0" layoutX="18.0" layoutY="426.0" pickOnBounds="true" preserveRatio="true" />
       <Label fx:id="ctrl_number" layoutX="166.0" layoutY="267.0" prefHeight="21.0" prefWidth="351.0" text="00-550-0055" textFill="RED">
          <font>
@@ -66,17 +38,34 @@
             <TextField fx:id="pxVehicleNo" layoutX="141.0" layoutY="208.0" prefHeight="21.0" prefWidth="143.0" promptText="15" text="15" />
             <Label layoutX="10.0" layoutY="253.0" text="VEHICLE DESCRIPTION" />
             <TextField fx:id="pxDescription" layoutX="141.0" layoutY="249.0" prefHeight="21.0" prefWidth="143.0" promptText="15" text="15" />
-            <Label layoutX="44.0" layoutY="296.0" text="DESIGNATION 1" />
-            <TextField fx:id="pxDes1" layoutX="141.0" layoutY="292.0" prefHeight="21.0" prefWidth="143.0" promptText="15" text="15" />
-            <Label layoutX="45.0" layoutY="340.0" text="DESIGNATION 2" />
-            <TextField fx:id="pxDes2" layoutX="141.0" layoutY="337.0" prefHeight="21.0" prefWidth="143.0" promptText="15" text="15" />
             <Label layoutX="36.0" layoutY="90.0" text="LABEL TEXT SIZES">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Button layoutX="114.0" layoutY="397.0" mnemonicParsing="false" onAction="#saveOnclick" prefHeight="40.0" prefWidth="90.0" text="SAVE" />
+            <Button layoutX="104.0" layoutY="306.0" mnemonicParsing="false" onAction="#saveOnclick" prefHeight="25.0" prefWidth="90.0" text="SAVE IMAGE" />
          </children>
       </AnchorPane>
+      <Text fx:id="business_name" layoutX="209.0" layoutY="319.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <font>
+            <Font name="Consolas Bold" size="15.0" />
+         </font>
+      </Text>
+      <Text fx:id="business_address" layoutX="209.0" layoutY="344.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <font>
+            <Font name="Consolas Bold" size="15.0" />
+         </font>
+      </Text>
+      <Text fx:id="vehicle_plate_number" layoutX="209.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <font>
+            <Font name="Consolas Bold" size="15.0" />
+         </font>
+      </Text>
+      <Text fx:id="vehicle_description" layoutX="209.0" layoutY="395.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <font>
+            <Font name="Consolas Bold" size="15.0" />
+         </font>
+      </Text>
+      <VBox fx:id="crew_list" layoutX="188.0" layoutY="442.0" prefHeight="144.0" prefWidth="324.0" />
    </children>
 </AnchorPane>

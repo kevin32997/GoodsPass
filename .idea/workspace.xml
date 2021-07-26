@@ -8,44 +8,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2a17faae-0719-4772-85c2-98122fd728f2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GoodsRegistry.iml" beforeDir="false" afterPath="$PROJECT_DIR$/GoodsRegistry.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/BitBuffer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/DataTooLongException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrCode$Ecc.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrCode.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrCodeGeneratorDemo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrCodeGeneratorWorker.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrSegment$Mode.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrSegment.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/QrSegmentAdvanced.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/io/nayuki/qrcodegen/layout_to_print.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/PrintImage.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/CreateBusinessDialogCtrl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/MainActivityController$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/MainActivityController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/PrintLayoutController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/SearchViewCtrl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/ViewBusinessInfoController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/controller/ViewPassDialogController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/css/pass_infotables_style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/helpers/SQLDatabase.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/layout/create_business_dialog_layout.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/layout/dialog_view_business_layout.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/layout/dialog_view_member_layout.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/layout/layout_to_print.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/layout/main_activity_layout.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/layout/search_view_layout.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/models/BusinessInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/models/Crew.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/models/Goodspass.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/models/Passes.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/models/Setting.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/GoodsRegistry/printimage/res/GoodsPass_Official.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qr-code.png" beforeDir="false" afterPath="$PROJECT_DIR$/qr-code.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/printimage/controller/MainActivityController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/printimage/controller/MainActivityController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/printimage/helpers/Helper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/printimage/helpers/Helper.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
